@@ -186,7 +186,7 @@ Post labels (flair, US-13): **Discussion, Rant, Assistance, Support**. Announcem
 |---|---|---|
 | Heading | `SectionHeader level={1}` with the term in the description | |
 | Student and Professor | `Grid columns={3}` of `Card`: `CardHeader` with `DoorPlate size="sm" outline code="BSIT 3A"`, `CardTitle` (subject), `CardMeta` (professor or student count), `CardAction` links "Open space" (P08) and "Group chat" (P12) | |
-| Chair and Dean | DS-8 `FilterBar` (`Search`, `Select` program for the Dean, `Select` year level) + `Table` (section, program, year, adviser, students, subjects), rows link to P08, `Pagination` | |
+| Chair and Dean | DS-8 `FilterBar` (`Search`, `Select` program for the Dean, `Select` year level) + `Table` on tablet and desktop; labeled section cards on phones. Cards retain section, program, year, adviser, student count, and subject, and link to P08. `Pagination` applies to both views. | |
 
 **States**
 

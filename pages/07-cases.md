@@ -37,8 +37,9 @@ Handlers see a report only while it is at their stage (or in their program for t
 | Boundary | `PrivacyNotice` (compact) | "You see only reports routed to you. Every action is recorded." |
 | Tabs | `Tabs` with `count` | |
 | Filters | DS-8 `FilterBar`: `Search label="Search by reference"`, `Select` severity, `Select` category, `Select` status, `Select` received (7 days, 30 days, term) | No search by student name. |
-| Table (desktop) | `Table` with `allowsSorting`: Reference (row header, mono), Category, `Severity`, Status `Badge`, Received, Last action, Waiting (days) | Bypassed rows: `Badge form="restricted"` "Adviser bypassed". Guidance and later: Case File reference. Rows open P22. |
-| Rows (phones) | `ReportRecord` (`facts`: severity, received, stage) | |
+| Table (desktop, >=1024px) | `Table` with `allowsSorting`: Reference (row header, mono), Category, `Severity`, Status `Badge`, Received, Last action, Waiting (days) | Bypassed rows: `Badge form="restricted"` "Adviser bypassed". Guidance and later: Case File reference. Rows open P22. |
+| Rows (phones and tablets, <1024px) | `ReportRecord` (`facts`: severity, received, last action, waiting days, office; adviser-bypassed routing where applicable) | Retains table status, reference, category, and `Open` action. |
+| Sorting (phones and tablets) | Labeled `Select` controls for sort field and direction | Same sortable fields and ascending/descending behavior as the desktop table. |
 | Paging | `Pagination` | |
 | Empty | `EmptyState` per tab ("No reports assigned to you"); `ViewState kind="empty"` when filters match nothing | |
 

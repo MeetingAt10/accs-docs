@@ -42,8 +42,8 @@ Consultation states (STU-05, PRO-05): **Requested → Approved → Booked → Co
 | Heading | `SectionHeader level={1} split title="Calendar"`, `actions` = `Button icon="plus"` "Add to-do" (students), `Button variant="secondary"` "Manage availability" (professors, P17) | |
 | Toolbar | `Row`: `SegmentedControl` (Month, Week, List), `IconButton icon="caret-left" label="Previous"`, `IconButton icon="caret-right" label="Next"`, `Button variant="tertiary"` "Today" | |
 | Layers | `TagGroup label="Show" selectionMode="multiple"` with lane tints | Switching calendars (STU-04). |
-| Month, List | DS-5 `EventCalendar` | |
-| Week | `Timetable` with `TimeBlock` (`lane="schedule"` institutional, `lane="community"` organization, `lane="consult"` availability), `NowLine` | |
+| Month, List | DS-5 `EventCalendar` | Tablet and desktop Month view use the seven-column calendar grid. Phone Month view replaces the grid with a date-grouped event list and a native date input. List view presents the month’s events in date and time order. |
+| Week | `Timetable` with `TimeBlock` (`lane="schedule"` institutional, `lane="community"` organization, `lane="consult"` availability), `NowLine` | Tablet and desktop show the timetable grid; phones show events grouped by day in an agenda list. Selecting an event opens its details in a bottom drawer on phones. |
 | Event detail | `Popover` on desktop, `Drawer side="bottom"` on phones: title, type `Badge`, time, description, contact (`Link` to P38), availability state | Availability shows `Link` "Request this time" (P15). No edit controls without authority. |
 | Add to-do | `Modal title="Add to-do"`: `TextField`, `DatePicker label="Due"`; `PrivacyNotice` "Only you can see your to-dos." | |
 
@@ -94,9 +94,9 @@ Consultation states (STU-05, PRO-05): **Requested → Approved → Booked → Co
 |---|---|---|
 | Heading | `SectionHeader level={1} split title="Consultation requests"`, `actions` = `Button variant="secondary"` "Manage availability" (P17) | |
 | Tabs | `Tabs`: To decide (`count`), Upcoming, History | |
-| To decide | `Table` (student, requested time, sent, topic), rows open P16 | |
+| To decide | `Table` on tablet and desktop; labeled request cards on phones (student, requested time, status, updated, topic), each opens P16 | |
 | Upcoming | `Agenda` of booked consultations | |
-| History | `Table` + `Pagination` | |
+| History | `Table` + `Pagination` on tablet and desktop; labeled request cards on phones, with the same P16 destination | |
 | Empty | `EmptyState title="No requests to decide"` | |
 
 ---

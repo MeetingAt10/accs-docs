@@ -35,6 +35,7 @@ Each page has:
 - **Page heading:** `SectionHeader level={1}` in the content; `TopBar` repeats the title as a `p`.
 - **Region states:** `ViewState` inside the region (`loading`, `empty`, `error`, `restricted`); `EmptyState` when a whole list has nothing yet and the person can act; `Skeleton` while the layout is known.
 - **Confirmation:** `toast` for completed actions; `Alert` for anything people must read or fix; `Modal role="alertdialog"` for destructive or irreversible actions.
-- **Tables on phones:** `ReportRecord` rows (or labeled rows) below 768px.
+- **Tables on phones:** use labeled rows or cards below 768px, retaining key fields, status, and actions; `ReportRecord` is one pattern. P07 oversight sections, P14 faculty requests, P30 cycles, and P31 completion use cards; calendar month and week views use date-grouped event lists.
+- **Message navigation on phones:** P11 shows the inbox list; opening a conversation switches to P12, which provides a "Back to conversations" link.
 - **Restricted content:** `PrivacyNotice` states who can open what. It never promises anonymity or outcomes.
 - **Sample data:** label synthetic records with `Badge outline marker={false}` "Sample data" while the prototype runs on simulated data.

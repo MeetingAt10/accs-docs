@@ -164,7 +164,7 @@ Cycle states: **Draft → In review (faculty) → Published → Closed**. Form s
 | Region | Components | Notes |
 |---|---|---|
 | Heading | `SectionHeader level={1} split title="Evaluation cycles"`, `actions` = `Button icon="plus"` "New cycle" | Opens a `Modal` (`Select` term, `TextField` name) that creates a Draft and opens P31. |
-| List | `Table`: term, forms, status `Badge` (Draft, In review, Published, Closed), completion `Meter`, open and close dates | Rows open P31. |
+| List | `Table` on tablet and desktop; labeled cycle cards on phones. Each item shows term, forms, status `Badge` (Draft, In review, Published, Closed), completion `Meter`, and open and close dates. | Rows or cards open P31; phone cards retain the same status and destination. |
 | Empty | `EmptyState title="No cycles yet"` with action "New cycle" | |
 
 ---
@@ -190,9 +190,9 @@ Cycle states: **Draft → In review (faculty) → Published → Closed**. Form s
 | Heading | `SectionHeader level={1} split`, `actions` = status `Badge`, `Button` "Publish" (`Modal role="alertdialog"` "Publish this cycle? Assigned students and faculty get their forms."), `Button variant="secondary"` "Close cycle" | Only valid transitions show. |
 | Tabs | `Tabs`: Setup, Questions, Faculty review, Completion | |
 | Setup | `TextField` name, `TextArea` instructions, `DatePicker` opens and closes, `CheckboxGroup label="Forms"` (Student to faculty, Faculty peer, Upward: Program Chair, Upward: Dean), `Select label="Participation rule"` † with `Alert tone="warning"` "Participation rule not decided (D-01)" | |
-| Questions | APP-18 `QuestionEditor` per form: rows of criterion, question, type (`Select`: Rating 1–5, Text), required `Switch`, `MenuButton` (Move up, Move down, Delete); `Button` "Add question"; `Disclosure title="Preview"` rendering DS-6 `RatingScale` | |
+| Questions | APP-18 `QuestionEditor` per form: rows on tablet and desktop, cards on phones. Each item contains criterion, question, type (`Select`: Rating 1–5, Text), required `Switch`, and `MenuButton` (Move up, Move down, Delete); `Button` "Add question"; `Disclosure title="Preview"` rendering DS-6 `RatingScale` | The phone card keeps its fields and ordering/deletion actions together. |
 | Faculty review | `Table` (professor, status `Badge` Reviewed / Commented / Not yet, comments), `Disclosure` per comment; `Button` "Send for review" | US-41: professors review questions against their duties. |
-| Completion | DS-1 `Stat` overall; DS-8 `FilterBar` (program); `Table` by section (assigned, submitted, `Meter`) and by faculty | Counts only. |
+| Completion | DS-1 `Stat` overall; DS-8 `FilterBar` (program); tables by section and faculty on tablet and desktop; labeled cards on phones. Each card retains name, program, assigned count, submitted count, and completion `Meter`. | Counts only; no individual answers are shown. |
 
 **States**
 

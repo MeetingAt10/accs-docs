@@ -37,7 +37,7 @@ Direct chats are one-to-one. Group chats belong to a section or subject and foll
 | Search | `Search label="Search conversations"` | Searches names and group titles, not message text in other people's chats. |
 | Filter | `Tabs` (All, Direct, Groups) with `count` for unread | |
 | List | DS-3 `ConversationList`: `Avatar` / `AvatarGroup`, name or group title, `RoleBadge`, last-message preview, time, unread count | Previews never include case content. |
-| Right pane | `EmptyState title="Pick a conversation"` | Desktop only; phones show the list alone. |
+| Right pane | `EmptyState title="Pick a conversation"` | Desktop shows the inbox beside an empty thread pane. Phones show the inbox list alone; opening a conversation switches to P12. |
 | New message | `Modal title="New message"`: `ComboBox label="To"` (permitted recipients only, `emptyMessage="No one you can message matches"`), `TextArea label="Message"`, `ModalActions` Cancel / Send | |
 
 **States**
@@ -67,6 +67,7 @@ Direct chats are one-to-one. Group chats belong to a section or subject and foll
 | Region | Components | Notes |
 |---|---|---|
 | Header | `Row`: `Avatar` or `AvatarGroup`, title, `RoleBadge`, member count; `MenuButton iconOnly` (Members, Mute) | Members open in a `Drawer side="end"`. Mute uses a `Switch` there. |
+| Phone return | `Link href="/messages"` "Back to conversations" | Returns from the phone thread view to the inbox list. |
 | Case warning | `Alert tone="neutral"` "Keep case details in the case record." | Guidance and OSAS conversations (GUD-05-B, OSAS-04-B). |
 | Messages | DS-3 `MessageList` with `Divider label` per day and DS-3 `MessageBubble` (sender and `RoleBadge` in groups, time, body, own or other side) | `Button variant="tertiary"` "Load earlier messages" at the top. |
 | Bubble actions | `MenuButton iconOnly` per bubble: Copy, Report message | Report opens a `Modal` with a reason and the note "A report starts a human review. It isn't a finding." |
