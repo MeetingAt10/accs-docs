@@ -105,7 +105,7 @@ Use a 4 px base scale: `1=4`, `2=8`, `3=12`, `4=16`, `5=20`, `6=24`, `8=32`, `10
 - Navigation width: 248 px expanded; compact icon mode only when every item retains an accessible name and tooltip.
 - Content: fluid width, maximum reading width 800 px; data-heavy pages may use full available width.
 - Breakpoints: 640 px small/mobile, 768 px tablet, 1024 px desktop, 1280 px wide layout. Treat these as layout thresholds, not device categories.
-- Mobile: replace persistent sidebar with a labeled menu/drawer; keep the current page title and primary action visible; use stacked cards instead of horizontally overflowing tables.
+- Mobile: replace the persistent sidebar with a labeled menu/drawer; keep the current page title and primary action visible; use stacked cards instead of horizontally overflowing tables. Calendar month and week views use date-grouped event lists on phones, with a native date input for date selection; retain the month grid and week timetable at tablet and desktop widths.
 - Avoid fixed-height panels for content and forms. Use sticky headers only when they preserve usable viewport space.
 
 ### Surfaces, borders, and elevation
@@ -139,10 +139,45 @@ Use a 4 px base scale: `1=4`, `2=8`, `3=12`, `4=16`, `5=20`, `6=24`, `8=32`, `10
 
 ### Navigation and wayfinding
 
-- Use a stable primary nav for Home, Announcements, Tasks, Documents, Departments, Support, and Profile; adjust only after product scope confirms these modules.
-- Show current location with text plus a non-color indicator.
+- ACCS is seven module sites with a stable top-level order: Home, Forums, Schedule, Cases, Evaluations, Records, Admin. Show a site only when the current session has an allowed destination in it. Each site has its own host, landing page, hero, and lane color ([sitemap §4](sitemap.md#4-primary-navigation-and-contextual-sidebar)).
+- Keep the desktop site switcher above the page and use the left sidebar for destinations within the current site. On mobile, put a **Sites** section first in the navigation drawer, followed by the current site's destinations.
+- Filter contextual destinations by the signed-in person's allowed pages and role-specific labels. Navigation helps people find pages; it does not replace route or API authorization.
+- Show the current site and page with text plus a non-color indicator: the switcher marks the current site with `aria-current` and a sliding fill, and the sidebar marks the current page.
+- Show a site hero (title, one-line purpose, module IDs, art) only on a site's landing routes, not on every page.
+- Show the site in the document title as `<Page> · ACCS <Site>`, with generic page names only.
 - Use breadcrumbs for deep document/department paths. Do not use breadcrumbs as the only way back.
 - Keep global actions separate from navigation; do not hide essential items in an unlabeled icon rail.
+
+#### Site lanes
+
+Each site carries one lane tint, set as `data-lane` on the shell and used for the switcher indicator, the hero wash, and the Home directory tile hover. A lane reinforces where the person is; it never carries meaning alone.
+
+| Site | Lane | Tint |
+|---|---|---|
+| Home, Evaluations, Admin | navy (default) | `--ds-action-default`, wash mixed from it at 9% |
+| Forums | community, violet | `--ds-accent-default`, wash `--ds-accent-bg` |
+| Schedule | consult, teal | `--ds-secondary-700`, wash `--ds-secondary-bg` |
+| Cases, Records | neutral | `--ds-text-secondary`, wash mixed from it at 7% |
+
+- Violet and teal keep their existing roles: community and secondary emphasis. Do not use them for status.
+- Schedule uses `secondary-700`, not a lighter teal, for the solid switcher indicator so the white label on the current item stays readable.
+- Cases and Records stay neutral to follow the grievance mode above: no playful or brand color on confidential work.
+
+#### Site art
+
+Site art is decorative: `alt=""`, never the only way to identify a site. The files are transparent WebP converted from the `meeting-at-ten-assets` set and live in `frontend/public/brand/`. Each site shows its art on the hero (landing routes only) and on its Home directory tile.
+
+| Public file | Used for | Source in `meeting-at-ten-assets` |
+|---|---|---|
+| `brand/sites/portal.webp` | Home | `brand-symbols/06-orbital-ring-crest` |
+| `brand/sites/forums.webp` | Forums | `graphic-primitives-set8/06-nodal-constellation` |
+| `brand/sites/schedule.webp` | Schedule | `floating-forms-set15/03-twisting-ribbon-torus` |
+| `brand/sites/cases.webp` | Cases | `institutional-badges/05-faceted-c-shield` |
+| `brand/sites/evaluations.webp` | Evaluations | `graphic-primitives-set8/04-frosted-faceted-prism` |
+| `brand/sites/records.webp` | Records | `sculptural-elements/06-structural-grid-cube` |
+| `brand/sites/admin.webp` | Admin | `functional-assets/05-cloud-server` |
+| `brand/sites/crest.webp` | Sign-in brand panel | `brand-symbols/01-sapphire-crest` |
+| `brand/topographic.webp` | Sign-in brand panel background | `accs-backgrounds-12/06-topographic` |
 
 ### Cards, lists, and tables
 
@@ -194,9 +229,20 @@ Target **WCAG 2.2 AA**. Text contrast: at least 4.5:1 for normal text and 3:1 fo
 - Use semantic HTML, accessible names, correct headings, and announced status changes. Color never carries meaning alone.
 - Aim for 44 × 44 CSS px touch targets on common mobile actions; separate adjacent targets.
 - Support 200% zoom and narrow reflow without loss of content or function.
-- Respect `prefers-reduced-motion`; use transitions only to clarify state or spatial change, normally 120–200 ms.
+- Respect `prefers-reduced-motion`; use transitions only to clarify state or spatial change, normally 120–200 ms. Page-entry reveals may take up to 320 ms (see Motion below).
 - Provide text alternatives for meaningful images and accessible names for icon buttons.
 - Do not rely on tooltips as the only source of essential instructions.
+
+### Motion
+
+Motion in the signed-in shell uses the design system tokens (`--ds-motion-duration-*`, `--ds-motion-ease-*`, `--ds-motion-distance-rise`).
+
+- **Route changes:** View Transitions where the browser supports them. The old page fades out in 120 ms and the new page fades in over 200 ms.
+- **Reveals:** the sections of a new page, the module chips, and the Home directory tiles rise 8 px over 320 ms (chips 480 ms), staggered by short delays of up to 160 ms (250 ms for directory tiles).
+- **Switcher:** the current-site indicator slides between items.
+- **Hero art:** enters once (640 ms), then floats 8 px with a slight tilt on a 7 s loop. It is the only looping animation and is decorative.
+- **Tiles:** lift 2 px on hover; the tile art tilts and scales slightly.
+- **Reduced motion:** with `prefers-reduced-motion: reduce`, the reveals, float, view transitions, and hover movement are removed, and the switcher indicator follows the provider's Motion setting. Content and the current-site marker stay visible without motion.
 
 ## 8. Implementation contract
 
