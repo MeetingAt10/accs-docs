@@ -143,7 +143,7 @@ Use a 4 px base scale: `1=4`, `2=8`, `3=12`, `4=16`, `5=20`, `6=24`, `8=32`, `10
 - Use the 72 px site rail (one icon per site the role may open) for switching sites and the contextual sidebar for destinations within the current site. On mobile, put a **Sites** section first in the navigation drawer, followed by the current site's destinations.
 - Filter contextual destinations by the signed-in person's allowed pages and role-specific labels. Navigation helps people find pages; it does not replace route or API authorization.
 - Show the current site and page with text plus a non-color indicator: the switcher marks the current site with `aria-current` and a sliding fill, and the sidebar marks the current page.
-- Signed-in pages use no illustration art: no heroes, floating art, or art tiles. The crest on the sign-in and registration brand panel is the only brand graphic. App foundation tokens (`--accs-*`, per-site `--site-accent`) and primitives live in `frontend/src/styles.css`, `frontend/src/components/app/page-shell.tsx`, and the motion layer in `frontend/src/motion.css` (see [the 2026-11-01 delta](deltas/2026-11-01-real-auth-and-visual-refactor.md)).
+- Signed-in pages use no illustration art: no heroes, floating art, or art tiles. The app ships no generated picture assets; the sign-in and registration brand panel uses the design-system `DoorPlate` ("ACCS | CCS") over a CSS gradient. App foundation tokens (`--accs-*`, per-site `--site-accent`) and primitives live in `frontend/src/styles.css`, `frontend/src/components/app/page-shell.tsx`, and the motion layer in `frontend/src/motion.css` (see [the 2026-11-01 delta](deltas/2026-11-01-real-auth-and-visual-refactor.md)).
 - Show the site in the document title as `<Page> · ACCS <Site>`, with generic page names only.
 - Use breadcrumbs for deep document/department paths. Do not use breadcrumbs as the only way back.
 - Keep global actions separate from navigation; do not hide essential items in an unlabeled icon rail.
@@ -165,19 +165,7 @@ Each site carries one lane tint, set as `data-lane` on the shell and used for th
 
 #### Site art
 
-Site art is decorative: `alt=""`, never the only way to identify a site. The files are transparent WebP converted from the `meeting-at-ten-assets` set and live in `frontend/public/brand/`. Each site shows its art on the hero (landing routes only) and on its Home directory tile.
-
-| Public file | Used for | Source in `meeting-at-ten-assets` |
-|---|---|---|
-| `brand/sites/portal.webp` | Home | `brand-symbols/06-orbital-ring-crest` |
-| `brand/sites/forums.webp` | Forums | `graphic-primitives-set8/06-nodal-constellation` |
-| `brand/sites/schedule.webp` | Schedule | `floating-forms-set15/03-twisting-ribbon-torus` |
-| `brand/sites/cases.webp` | Cases | `institutional-badges/05-faceted-c-shield` |
-| `brand/sites/evaluations.webp` | Evaluations | `graphic-primitives-set8/04-frosted-faceted-prism` |
-| `brand/sites/records.webp` | Records | `sculptural-elements/06-structural-grid-cube` |
-| `brand/sites/admin.webp` | Admin | `functional-assets/05-cloud-server` |
-| `brand/sites/crest.webp` | Sign-in brand panel | `brand-symbols/01-sapphire-crest` |
-| `brand/topographic.webp` | Sign-in brand panel background | `accs-backgrounds-12/06-topographic` |
+Removed on 2026-11-01. The generated WebP site art (`frontend/public/brand/`) is deleted; sites are identified by name, icon, and accent color only.
 
 ### Cards, lists, and tables
 

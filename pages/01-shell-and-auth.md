@@ -91,7 +91,7 @@ Signed in: redirect to `/home`. Signed out: redirect to `/sign-in`. Keep the cur
 
 ### Built sign-in, registration, and password reset
 
-Files: `src/routes/_auth/sign-in.tsx`, `register.tsx`, `-auth-shell.tsx`, `auth.css`. No app shell, no site list, and no links to internal sites. Split layout from 960 px: a navy brand panel (crest art `/brand/sites/crest.webp`, the only illustration in the app, a headline, three facts) and the form column. Below 960 px the brand panel becomes a compact navy strip above the form.
+Files: `src/routes/_auth/sign-in.tsx`, `register.tsx`, `-auth-shell.tsx`, `auth.css`. No app shell, no site list, and no links to internal sites. Split layout from 960 px: a navy brand panel (`DoorPlate` "ACCS | CCS", a headline, three facts; no images) and the form column. Below 960 px the brand panel becomes a compact navy strip above the form.
 
 | Page | Contents |
 |---|---|
