@@ -140,10 +140,10 @@ Use a 4 px base scale: `1=4`, `2=8`, `3=12`, `4=16`, `5=20`, `6=24`, `8=32`, `10
 ### Navigation and wayfinding
 
 - ACCS is seven module sites with a stable top-level order: Home, Forums, Schedule, Cases, Evaluations, Records, Admin. Show a site only when the current session has an allowed destination in it. Each site has its own host, landing page, hero, and lane color ([sitemap §4](sitemap.md#4-primary-navigation-and-contextual-sidebar)).
-- Keep the desktop site switcher above the page and use the left sidebar for destinations within the current site. On mobile, put a **Sites** section first in the navigation drawer, followed by the current site's destinations.
+- Use the 72 px site rail (one icon per site the role may open) for switching sites and the contextual sidebar for destinations within the current site. On mobile, put a **Sites** section first in the navigation drawer, followed by the current site's destinations.
 - Filter contextual destinations by the signed-in person's allowed pages and role-specific labels. Navigation helps people find pages; it does not replace route or API authorization.
 - Show the current site and page with text plus a non-color indicator: the switcher marks the current site with `aria-current` and a sliding fill, and the sidebar marks the current page.
-- Show a site hero (title, one-line purpose, module IDs, art) only on a site's landing routes, not on every page.
+- Signed-in pages use no illustration art: no heroes, floating art, or art tiles. The crest on the sign-in and registration brand panel is the only brand graphic. App foundation tokens (`--accs-*`, per-site `--site-accent`) and primitives live in `frontend/src/styles.css`, `frontend/src/components/app/page-shell.tsx`, and the motion layer in `frontend/src/motion.css` (see [the 2026-11-01 delta](deltas/2026-11-01-real-auth-and-visual-refactor.md)).
 - Show the site in the document title as `<Page> · ACCS <Site>`, with generic page names only.
 - Use breadcrumbs for deep document/department paths. Do not use breadcrumbs as the only way back.
 - Keep global actions separate from navigation; do not hide essential items in an unlabeled icon rail.

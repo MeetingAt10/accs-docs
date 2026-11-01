@@ -150,7 +150,8 @@ accs-landing (public, separate site)
 
 accs-system/frontend
 ├── P01 /                               Redirect: /home when signed in, else /sign-in
-├── P02 /sign-in                        Sign in (no app shell)
+├── P02 /sign-in                        Sign in, forgot password (no app shell)
+├──     /register                       Create an account: student, faculty, CCS staff (no app shell)
 │        (not found, error, and restricted are states inside the shell, not routes)
 │
 ├── P03 /home                           Dashboard, one page with role variants
@@ -232,7 +233,8 @@ src/routes/
 ├── __root.tsx                      DesignSystemProvider, ToastRegion (exists)
 ├── index.tsx                       P01 redirect
 ├── _auth.tsx                       Layout without the shell
-│   └── _auth/sign-in.tsx           P02
+│   ├── _auth/sign-in.tsx           P02
+│   └── _auth/register.tsx          Registration
 ├── _app.tsx                        AppShell + session guard (redirects to /sign-in?redirect=…)
 └── _app/
     ├── home.tsx                                    P03
@@ -319,7 +321,7 @@ A Chair or Dean who also teaches gets the Professor column as well (rule 3).
 
 The signed-in app is split into seven module sites in this fixed order: **Home**, **Forums**, **Schedule**, **Cases**, **Evaluations**, **Records**, **Admin**. This replaces the four-area model (Home, Community, Schedule, Workspace) of the [2026-10-27 delta](deltas/2026-10-27-shared-navigation.md); see [deltas/2026-11-01-subdomain-sites.md](deltas/2026-11-01-subdomain-sites.md). A site is a host and navigation boundary, not an authorization boundary: routes, page IDs, permissions, and API checks do not change, and the same build is served on all seven hosts.
 
-A site appears only when the current session has an allowed destination in it. On desktop, the sites appear in a switcher row above the page, and the left sidebar shows the current site's contextual destinations. On mobile, the drawer starts with a **Sites** section, followed by the current site's destinations. Each site link goes to the site's first permitted landing route.
+A site appears only when the person's role may open it (`siteRoles` in `src/lib/sites.ts`: Admin is administrator-only; Records is chair, dean, guidance, OSAS, President's Office, and administrator) and the session has an allowed destination in it. A path or host outside that set shows the Access denied page. On desktop, the sites appear as icons in the left site rail, and the left sidebar shows the current site's contextual destinations. On mobile, the drawer starts with a **Sites** section, followed by the current site's destinations. Each site link goes to the site's first permitted landing route.
 
 The route URLs stay as listed in §2. Contextual entries are filtered by the session's `allowedPages` and role-specific labels. This filtering helps people find pages; it does not grant access. The route guard and API continue to enforce permission and relationship checks independently.
 
@@ -333,7 +335,7 @@ The route URLs stay as listed in §2. Contextual entries are filtered by the ses
 | Records | `records` | `/records/*`, `/restrictions`, `/analytics` | CHR-03, CHR-05, DEAN-05, GUD-03, GUD-04, OSAS-02, OSAS-03, ADM-03 |
 | Admin | `admin` | `/admin/*` | ADM-01, ADM-02, ADM-04, ADM-05, ADM-06 |
 
-The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/` and `/sign-in` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
+The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/`, `/sign-in`, and `/register` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
 
 ### 4.1 Host resolution
 
@@ -347,7 +349,7 @@ The frontend decides which site the current host serves, in this order:
 
 - A route that belongs to another site, when that site has an origin, triggers a full-page redirect to `<origin><path><search>`. If the other site has no origin, the link stays on the current host.
 - Links to another site render as absolute `href`s, including links the design system renders through its provider. The top-bar search opens `/feed?q=` on Forums.
-- `/` and `/sign-in` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
+- `/`, `/sign-in`, and `/register` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
 - The session cookie belongs to the API host (`SameSite=None; Secure` in production), so one sign-in works on all deployed sites, in a browser that allows the API's cross-site cookie. The API accepts the seven site origins through a comma-separated `CORS_ORIGIN`.
 - `access-ccs.com` stays a proposal. No DNS, Route 53, or certificate change is made, and deployed sites use their CloudFront default hostnames (see `architecture/README.md`).
 

@@ -9,10 +9,10 @@ Wraps P03 to P52. Reference composition: design system `site/app/_site/examples/
 | Region | Components | Notes |
 |---|---|---|
 | Frame | `AppShell` | `density="comfortable"` for Student and Organization; `density="compact"` for handler and admin roles; the person can change it on P43. Skip link `.ds-skip-link` to `contentId`. |
-| Site switcher | `SiteSwitcher` (`site-chrome.tsx`): `nav aria-label="ACCS sites"` of `NavItem` links in the top bar's second row | Seven module sites in fixed order: Home, Forums, Schedule, Cases, Evaluations, Records, Admin. A site is listed only when the session has an allowed destination there, and the row is hidden when fewer than two sites qualify. Each link goes to the site's first permitted landing and, when the site has its own host, loads that host. The current site has `aria-current="page"` and a sliding indicator, so it is not marked by color alone. Desktop only (1024 px and up); on mobile the drawer's **Sites** section replaces it. See [sitemap §4](../sitemap.md#4-primary-navigation-and-contextual-sidebar). |
-| Contextual sidebar | APP-1 `RoleSidebar` = `Sidebar` + `SidebarSection` + `NavItem` (`icon`, `isCurrent`) | Shows only the current site's entries, filtered by `session.allowedPages` and labeled for the person's roles. The `Sidebar` label is "ACCS" plus the site name, and the role group named "Workspace" is titled with the site name. The sidebar is omitted when the site has no allowed entries for the person. This is navigation only; route and API checks still enforce access. |
-| Sidebar footer | `Avatar decorative`, name, one `RoleBadge` per role held, `SidebarNote` | The note says "Sample data. Access follows your assigned role and scope." Brand: `DoorPlate code="ACCS"` plus the current site's name (the same brand shows in the mobile header). |
-| Top bar | `TopBar` (`title`, `tools`) | Title repeats the page name as a `p`; while on simulated data add `Badge outline marker={false}` "Sample data". |
+| Site rail | `SiteRail` (`site-chrome.tsx`): 72 px navy rail, `nav aria-label="ACCS sites"` | One icon button with a short label per site the person's role may open (`canOpenSite` in `src/lib/sites.ts`: role in `siteRoles` and at least one allowed page). The current site has an accent fill, a 3 px indicator, and `aria-current="page"`; both slide between sites. The person's initials at the bottom open the account menu. No illustration art. |
+| Contextual sidebar | `SiteSidebar` (`site-chrome.tsx`) | 248 px, white. Site name and one-line purpose, then the current site's entries filtered by `session.allowedPages`, then account links. The current entry has the site accent wash. |
+| Sidebar footer | Initials avatar, name, role label, sign-out button | No sample-data note. |
+| Top bar | 56 px, translucent with blur, sticky | Breadcrumb `<Site> / <Page>`, search (768 px and up), assistant, notifications with unread dot; on phones a menu button opens the drawer. |
 | Search | `Search size="sm" className="ds-topbar__search"` | Searches posts and spaces the person can read and opens P04 with `?q=`; a link there offers "Search people" (P37). Never searches reports, cases, or records. |
 | Assistant | `IconButton icon="robot" label="Assistant"` → `Drawer side="end" title="Assistant"` with APP-17 | Passes the current page as context ("Explain this stage" on P20). Link to P41. |
 | Notifications | `IconButton icon="bell" dot label="Notifications, 2 unread"` → `Popover title="Notifications"` with DS-4 `NotificationList` (latest 5), `Button variant="tertiary"` "Mark all read", `Link variant="standalone"` "See all" (P40) | The label states the count in words. |
@@ -28,15 +28,13 @@ The shell is one component (`AppChrome` in `src/components/app/navigation.tsx`) 
 
 | Element | Where | Behavior |
 |---|---|---|
-| Site hero | `SiteHero`, above the page content on each site's landing routes | Shows the site title, a one-line purpose, the DOC003 module IDs the person's roles own on that site (shared ALL modules always), and the site art. The title is a time-of-day greeting with the person's first name on Home, and the site name elsewhere. The art is decorative (`alt=""`), hidden below 720 px, and floats slowly. Landing routes: Home `/home`, `/notifications`; Forums `/feed`, `/spaces`, `/messages`, `/directory`; Schedule `/calendar`, `/consultations`; Cases `/cases`, `/reports`; Evaluations `/evaluations`; Records `/analytics`, `/records`, `/restrictions`; Admin `/admin`. |
-| Home site directory | `SiteDirectory`, "Your sites", on `/home` below the hero and above the P03 dashboard | One `CardLink` tile per other site the person can open: art, site name, purpose, and up to four of the person's destination labels there. Hidden when the person has no other site. |
 | Document title | `src/routes/_app.tsx` | `<Page> · ACCS <Site>`, for example "My reports · ACCS Cases". When the page title equals the site name, the title is `<Page> · ACCS`. Titles use generic page names only, never record or case titles. |
-| Motion | `src/components/app/sites.css` | Route changes cross-fade through View Transitions where the browser supports them (old page out in 120 ms, new page in over 200 ms). Sections of the new page rise 8 px with a stagger of up to 160 ms; module chips and directory tiles stagger the same way. The sliding indicator moves between switcher items, and the hero art floats. Tiles lift 2 px on hover. All durations and easings use the design system's `--ds-motion-*` tokens. |
-| Reduced motion | `prefers-reduced-motion: reduce` | Removes the page and hero reveals, the art float, the View Transition animations, and the tile hover movement, so content appears at once. The switcher indicator follows the design system provider's Motion setting, which follows the operating system preference. |
+| Motion | `src/motion.css`, `motion/react` | Route changes cross-fade and rise through View Transitions. Page headers and sections (`.accs-stagger`) rise in sequence 60 ms apart; rows, table rows, grid items, and KPIs cascade; progress bars grow; active indicators slide (`layoutId`). |
+| Reduced motion | `prefers-reduced-motion: reduce` | Removes every entrance, cascade, slide, and hover movement; content appears at once. |
 
 Cases and Records use the neutral lane (grievance mode: a gray tint instead of a brand color). Forums uses the community (violet) lane, Schedule the consult (teal) lane, and the other sites navy. See [design-system.md](../design-system.md#navigation-and-wayfinding).
 
-Guard: `beforeLoad` checks the session and redirects to `/sign-in?redirect=<path>`. After sign-in the redirect is followed only if the new session may open it (S5 ALL-01-E).
+Guard: `beforeLoad` checks the session and redirects to `/sign-in?redirect=<path>` before any shell renders. A path or host the role may not open (`canOpenPath`) renders the full-page **Access denied** view (`AccessDenied` in `guards.tsx`: lock icon, "You don't have access to this page", the role and site named in one sentence, and a "Go to your home" button) with no shell links. After sign-in the redirect is followed only if the new session may open it (S5 ALL-01-E).
 
 ## P01 `/` — entry redirect
 
@@ -89,27 +87,25 @@ Signed in: redirect to `/home`. Signed out: redirect to `/sign-in`. Keep the cur
 | Spaces or letter case in the identifier | Record what happens; normalization is TBD | ALL-01-K |
 | Success | Land on `/home` in the role's view, or the permitted `redirect` | ALL-01-A, H |
 
-**Open.** Identifier format, registration flow, recovery, lockout, session length (identity policy).
+**Open.** Email delivery for reset codes, lockout shared across API instances, session length, and QCU identity-provider integration.
 
-### Prototype sign-in: split layout
+### Built sign-in, registration, and password reset
 
-The layout table and states above are the target spec. The prototype build (`src/routes/_auth/sign-in.tsx`, `sign-in.css`) has no email and password fields; the person picks a simulated demo account. It still has no app shell and uses a split layout: two columns from 1024 px up, stacked below that.
+Files: `src/routes/_auth/sign-in.tsx`, `register.tsx`, `-auth-shell.tsx`, `auth.css`. No app shell, no site list, and no links to internal sites. Split layout from 960 px: a navy brand panel (crest art `/brand/sites/crest.webp`, the only illustration in the app, a headline, three facts) and the form column. Below 960 px the brand panel becomes a compact navy strip above the form.
 
-| Region | Contents |
+| Page | Contents |
 |---|---|
-| Brand panel | `DoorPlate size="lg" code="ACCS"`, the headline "Your access to the College of Computer Studies", a one-line description, and a list of the seven site names (`aria-label="ACCS sites"`, with `aria-current` on the site this host serves). The crest art (`/brand/sites/crest.webp`, decorative) sits over the topographic background (`/brand/topographic.webp`). |
-| Sign-in panel | Heading "Sign in", or "Sign in to <Site>" when the host serves one site. `Badge outline` "Sample data" and a note that the accounts are simulated. |
-| Search | `Search` "Find a demo account" filters by name, email, description, and role. With no match the panel says `No demo account matches "<query>".` |
-| Accounts | Grouped under role headings, in the order Students, Student organization, Professors, CCS staff, Program chairs, Dean, Guidance, OSAS, President's Office, Administration. A multi-role account appears once, under the earliest of its roles in that order. Each account is one button named "Continue as <name>, <roles>" with avatar, name, description, and `RoleBadge`s. The pressed account shows a `Spinner` and the others are disabled until the request ends. |
-| States | Loading: `ViewState kind="loading"`. Account list failed: `ViewState kind="error"`. Sign-in failed: `Alert tone="danger"` "Sign-in failed". |
+| `/sign-in` | "Email or ID" (email, user ID, or student/employee number), password with show/hide, Remember me (30-day cookie), Forgot password, Sign in (loading state). Errors: `INVALID_CREDENTIALS` "The email, ID, or password is incorrect."; `TOO_MANY_ATTEMPTS` after 5 failures in 15 minutes; network failure. Link to `/register`. |
+| Forgot password | Inline panel swap on `/sign-in`: email or ID, then a 6-digit code (15 minutes, single use) with a new password and confirmation. The API always answers the same way, so it never reveals whether an account exists. No email provider is connected yet; the page says to contact the CCS office if no email arrives. |
+| `/register` | About you (full name, QCU email, student or employee ID `NN-NNNN` / `NNNN-NNNN`), role (Student, Faculty, CCS staff; students also give program, year level 1–4, section A–F), password with a four-step strength meter and confirmation. Chair, dean, guidance, OSAS, President's Office, and administrator access is granted by an administrator, never self-selected. Success signs the person in and opens their landing page. |
 
-After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` is served on every host. The page elements reveal in a short stagger, which `prefers-reduced-motion: reduce` turns off.
+Password rule: 10+ characters with upper and lower case, a number, and a symbol. Seeded pilot accounts sign in with their ID or email and the shared pilot password `Accs@Qcu2026!`, which must be rotated or disabled before real users join.
 
-### Local demo-role launcher
+After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` and `/register` are served on every host.
 
-The frontend's optional Vite launcher at `/__roles` lists accounts from the selected demo API. Each link opens `/__role?account=<id>` on that account's own `*.localhost` hostname, signs in through the existing endpoint, and opens Home or Administration. Host-only session cookies keep different account hostnames independent in one browser window. Tabs for the same account hostname share a session, and all accounts share the selected API's records.
+### Local role launcher
 
-Enable it with `ACCS_ROLE_LAUNCHER=1`, keep `VITE_API_URL=/api`, and use `ACCS_DEV_API_TARGET` to select the backend (default `http://localhost:3000`). Vite binds to `127.0.0.1` and rejects nonlocal hosts. This launcher is a local development tool; production builds keep the normal sign-in flow. See the [frontend startup instructions](../../frontend/README.md#compare-demo-accounts-in-separate-tabs).
+The optional Vite launcher (`ACCS_ROLE_LAUNCHER=1`) opens `/__role?account=<ID>` on that account's own `*.localhost` hostname and signs in with the seeded pilot password. `/__roles` no longer lists accounts, because the account list endpoint was removed. Use `ACCS_DEV_API_TARGET` to select the backend (default `http://localhost:3000`). Local development only.
 
 ## System states (inside the shell)
 
