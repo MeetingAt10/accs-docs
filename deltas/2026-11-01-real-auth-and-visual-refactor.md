@@ -96,3 +96,14 @@ Requested role names map to the ACCS role set: system administrator / IT support
 4. A student sees no Admin or Records link anywhere, and `/admin/*` or `/records/*` shows the 403 screen; signed-out visits to any app path land on `/sign-in`.
 5. No horizontal overflow at 1440×900, 768×1024, and 390×844.
 6. Backend tests, frontend typecheck, and the DOC003 58-module test pass.
+
+## 4. Copy and layout cleanup (unslop pass)
+
+All user-visible copy in the frontend and the backend seed and service strings was rewritten in plain, specific, sentence-case wording (no em dashes in prose, no sample, demo, synthetic, pilot, or prototype wording). Seed data reads like CCS traffic: rooms such as IC 301, terms such as "1st Semester AY 2026-2027", and real office names.
+
+Layout repetition was removed:
+
+- KPI strips stay only where the numbers drive a decision: Home, Records analytics, Admin overview and monitoring, and Evaluations results. Elsewhere counts moved into pill labels or a one-line summary (Schedule availability, Cases, Evaluations home, student record, restrictions).
+- Card grids that were really lists became row lists: My classes, Organizations, Similar reports, Directory.
+- Decorative icon tiles, glass blur on toolbars, gradient bars, and intro lines that restated the page title were removed. The Cases stage strip became a Stage filter in the queue toolbar.
+- Evaluations sticky bars sit under the 56 px top bar.
