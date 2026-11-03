@@ -34,7 +34,7 @@ Split the signed-in app into seven **module sites**. Each site has its own host,
 
 When a route belongs to another site and that site has an origin, the router does a full-page redirect to `<origin><path><search>`. Links render absolute `href`s to the other site. The session cookie belongs to the API host (`SameSite=None; Secure` in production), so one sign-in works across all deployed sites.
 
-`access-ccs.com` stays a proposal. No DNS, Route 53, or certificate change is made. Deployed sites use their CloudFront default hostnames.
+`access-ccs.com` was a proposal when this delta was written. It was registered on 2026-11-03: prod sites use `<label>.access-ccs.com` and dev sites `<label>-dev.access-ccs.com` (see `architecture/README.md`). The CloudFront default hostnames still work.
 
 ### Shell and visual redesign
 
