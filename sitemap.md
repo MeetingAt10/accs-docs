@@ -351,7 +351,7 @@ The frontend decides which site the current host serves, in this order:
 - Links to another site render as absolute `href`s, including links the design system renders through its provider. The top-bar search opens `/feed?q=` on Forums.
 - `/`, `/sign-in`, and `/register` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
 - The session cookie belongs to the API host (`SameSite=None; Secure` in production), so one sign-in works on all deployed sites, in a browser that allows the API's cross-site cookie. The API accepts the seven site origins through a comma-separated `CORS_ORIGIN`.
-- `access-ccs.com` stays a proposal. No DNS, Route 53, or certificate change is made, and deployed sites use their CloudFront default hostnames (see `architecture/README.md`).
+- Prod (`main`, stack `accs-prod`) serves `portal.access-ccs.com`, `forums.access-ccs.com`, and so on; dev (`dev`, stack `accs-dev`) serves `portal-dev.access-ccs.com`, `forums-dev.access-ccs.com`, and so on. The landing site on `access-ccs.com` is prod only. See `architecture/README.md`.
 
 ### 4.3 Labels and shared entries
 
