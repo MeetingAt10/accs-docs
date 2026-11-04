@@ -97,12 +97,20 @@ Files: `src/routes/_auth/sign-in.tsx`, `-auth-shell.tsx`, `auth.css`. No app she
 
 | Page | Contents |
 |---|---|
-| `/sign-in` | "Email or ID" (email, user ID, or student/employee number), password with show/hide, Remember me (30-day cookie), Forgot password, Sign in (loading state). Errors: `INVALID_CREDENTIALS` "The email, ID, or password is incorrect."; `TOO_MANY_ATTEMPTS` after 5 failures in 15 minutes; network failure. |
+| `/sign-in` | "Email or ID" (email, user ID, username, or student/employee number), password with show/hide, Remember me (30-day cookie), Forgot password, Sign in (loading state). Errors: `INVALID_CREDENTIALS` "The email, ID, or password is incorrect."; `TOO_MANY_ATTEMPTS` after 5 failures in 15 minutes; network failure. |
 | Forgot password | Inline panel swap on `/sign-in`: email or ID, then a 6-digit code (15 minutes, single use) with a new password and confirmation. The API always answers the same way, so it never reveals whether an account exists. No email provider is connected yet; the page says to contact the CCS office if no email arrives. |
 
 Password rule: 10+ characters with upper and lower case, a number, and a symbol. Seeded pilot accounts sign in with their ID or email and the shared pilot password, which each environment sets through the stack parameter `SeedPassword` (Lambda `SEED_PASSWORD`; a built-in default applies to local runs and tests only), which must be rotated or disabled before real users join.
 
 After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` is served on every host.
+
+### First sign-in (`/first-login`)
+
+File: `src/routes/first-login.tsx`. An account created by the secretary, and the secretary once the Dean activates it, signs in with a temporary username and password. Sign-in then sends the person to `/first-login`, and every other route redirects there (`mustChangeCredentials` on the session) until the change is done. The page asks for the temporary password, a new username (3 to 32 characters: letters, numbers, dot, dash, underscore), and a new password with confirmation, under the same password rule as above. On success the person goes to the `redirect` parameter or their landing page, and other devices are signed out. A person without temporary credentials who opens the page is redirected away; a signed-out visitor goes to `/sign-in`. Sign-in accepts the username as an identifier next to email, ID, and student/employee number. API: `POST /api/auth/complete-first-login` ([backend README](../../backend/README.md)).
+
+### Dev toolbox (development stack only)
+
+A floating button with the ACCS logo and a toolbox icon (`src/components/dev-toolbox/`) lists accounts grouped by role. Picking one makes the API end the current session and start one for that account, so testers change user without signing out. It is loaded only when the build sets `VITE_DEV_TOOLBOX=true` (or under `vite dev`); other builds do not contain it. The API routes (`GET /api/dev/users`, `POST /api/dev/switch-user`) exist only on the `accs-dev-` stack and every switch is audited. Anyone signed in there can become any active account, the Dean included, so keep real student data off that stack. Not part of the product UI.
 
 ### Local role launcher
 

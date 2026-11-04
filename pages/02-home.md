@@ -26,6 +26,10 @@ Back to [index](README.md) · [sitemap](../sitemap.md)
 | Region headings | `SectionHeader level={2} split` with a "See all" `Link` | |
 | Loading | `Skeleton` per region | |
 
+### Module picker
+
+`ModulePicker` (`src/components/app/module-picker.tsx`) sits under the heading: a "Choose a module" grid of tiles for the person's roles, in e-services style. A built module (Concerns, Schedule, Messages, Notifications for students and professors; Accounts for the Dean and secretary) links to its first page the session may open. A module not built yet (Dean, Program chair, Guidance, OSAS, President's office) shows a tile marked "Not available yet" with no link. Advisor tiles show for every professor until the session carries adviser assignments.
+
 ### Variants
 
 **Student**

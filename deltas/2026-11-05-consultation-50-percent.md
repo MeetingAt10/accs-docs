@@ -1,6 +1,6 @@
 # Delta: account provisioning and the concern flow for the 50% check
 
-**Status:** in progress, 2026-11-05
+**Status:** implemented on dev, 2026-11-05
 **Source:** capstone consultation of 2026-11-04. Summary and transcript are in `~/Development/whisper/output/2026-11-04/` (`capstone_summary_20261104.txt`, `capstone_20261104_132842.md`). The no-registration rule is a team decision made after the consultation; it is not in the transcript.
 
 ## Existing behavior touched
@@ -47,6 +47,15 @@ There is no registration on the landing page or anywhere else. Student accounts 
 
 E-services style: one sign-in, then a full-page module picker for the role. Dean, program chair and other unfinished modules appear as tiles with no function. A signed-in user does not sign in again when moving between module sites.
 
+### 5. Dev toolbox (slice E, development stack only)
+
+A floating toolbox button, using the ACCS logo with a toolbox icon, appears on the `-dev` hosts. It lists accounts grouped by role. Picking one swaps the session cookie to that account, so testers can change users and roles without signing out.
+
+- The session cookie is `httpOnly`, so the API performs the swap: it ends the current session and starts one for the chosen account. The browser holds no stored passwords.
+- The API routes exist only when `TABLE_PREFIX` is the `accs-dev-` stack. On any other stack they return 404. The caller must already be signed in, and every switch is audited.
+- The toolbox code is excluded from the production frontend build.
+- Risk accepted for development: anyone signed in on the dev stack can become any dev account, including the Dean. Keep real student data off the dev stack.
+
 ### Out of scope for 50%
 
 Escalation past advisor and chair, OSAS and Guidance status updates, confidential flag, strikes and clearance blocks, AI urgency ranking, faculty load upload, teacher evaluation changes, forum changes, QR registration.
@@ -60,12 +69,23 @@ Escalation past advisor and chair, OSAS and Guidance status updates, confidentia
 4. A second app instance sharing the same store sees the first instance's concern (test).
 5. Backend and frontend typecheck, tests and build pass.
 
+## Implementation notes
+
+Slices B to E are implemented on `dev`. These points differ from the plan above.
+
+- **Scheduling.** The student gives a preferred date and time, and the handler sets the scheduled time, link or place. Booking the handler's open slots through the API exists (`slotId`), but the screen has no slot picker yet.
+- **Email.** There is no email channel. The UI shows the credentials and the sign-in link once to the Dean or secretary to pass on.
+- **Program chair.** For a concern about the adviser, the program chair is chosen automatically from the student's program, not by the student.
+- **Stack limits.** The AWS account has a concurrency limit of 10 Lambda executions shared by accs-dev and accs-prod. Bursts above that returned 503 during testing.
+- **Excel columns.** The column names are assumptions until a sample MIS file is provided.
+
 ## Open items
 
 - Next check date, presenter and default credential format were not stated in the consultation.
 - No sample MIS Excel file has been seen, so column names are assumptions until one is provided.
-- Invite email needs SES on access-ccs.com (new infrastructure on `architecture` main, which deploys both accs-dev and accs-prod). Until approved, the secretary sees a copyable invite and the mailer logs instead of sending.
+- Invite email needs SES on access-ccs.com (new infrastructure on `architecture` main, which deploys both accs-dev and accs-prod). It is not approved; see Implementation notes for what the app does meanwhile.
 
 ## Fold-in record
 
 - Slice A: folded into `sitemap.md` and `pages/` on 2026-11-05.
+- Slices B to E: folded into `sitemap.md` (roles, permission matrix, who can see a concern, talk modes, first sign-in), `pages/01-shell-and-auth.md` (first-login page, dev toolbox), `pages/02-home.md` (module picker), `pages/06-reports.md` (P19, P20), `pages/07-cases.md` (P22), `pages/11-admin.md` (`/accounts`), and `frontend/README.md` on 2026-11-05.
