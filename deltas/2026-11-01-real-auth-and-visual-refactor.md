@@ -1,6 +1,7 @@
 # Delta: real sign-in and registration, and the app visual refactor
 
 **Status:** implemented, 2026-11-01
+**Superseded in part:** the public registration page and `/register` route below are removed by [`2026-11-05-consultation-50-percent.md`](2026-11-05-consultation-50-percent.md) (no public registration; accounts come from the secretary or the MIS/registrar import).
 **Builds on:** [`2026-11-01-subdomain-sites.md`](2026-11-01-subdomain-sites.md)
 
 ## Why
