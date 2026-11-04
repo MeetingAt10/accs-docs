@@ -16,7 +16,7 @@
 | S5 | `DOC005_BLACK-BOX-TEST-BLUEPRINT.docx` (2026-10-23) | Valid, invalid, and boundary cases (183) each page must pass |
 | S6 | `meetingatten-design-system` v1.0.1 specs (`components/**`) and React exports | Component names, variants, states |
 
-Prototype limits from S1: CCS only (IT, CS, IS); web only; official QCU email only, no personal phone or external messaging; simulated enrollment data and sample records, no live registrar connection (Delimitation 5); the AI assistant supports processes and never decides. The registration flow, password recovery, lockout, and session expiry are TBD (S5 ALL-01-F, G, K, L).
+Prototype limits from S1: CCS only (IT, CS, IS); web only; official QCU email only, no personal phone or external messaging; simulated enrollment data and sample records, no live registrar connection (Delimitation 5); the AI assistant supports processes and never decides. There is no public registration (team decision, 2026-11-05): student accounts come from the MIS/registrar list the secretary imports, or are added by the secretary, and other accounts are created by the secretary after the Dean activates the secretary. Password recovery, lockout, and session expiry are TBD (S5 ALL-01-G, K, L).
 
 ## How the app is organized
 
@@ -151,7 +151,6 @@ accs-landing (public, separate site)
 accs-system/frontend
 ├── P01 /                               Redirect: /home when signed in, else /sign-in
 ├── P02 /sign-in                        Sign in, forgot password (no app shell)
-├──     /register                       Create an account: student, faculty, CCS staff (no app shell)
 │        (not found, error, and restricted are states inside the shell, not routes)
 │
 ├── P03 /home                           Dashboard, one page with role variants
@@ -233,8 +232,7 @@ src/routes/
 ├── __root.tsx                      DesignSystemProvider, ToastRegion (exists)
 ├── index.tsx                       P01 redirect
 ├── _auth.tsx                       Layout without the shell
-│   ├── _auth/sign-in.tsx           P02
-│   └── _auth/register.tsx          Registration
+│   └── _auth/sign-in.tsx           P02
 ├── _app.tsx                        AppShell + session guard (redirects to /sign-in?redirect=…)
 └── _app/
     ├── home.tsx                                    P03
@@ -335,7 +333,7 @@ The route URLs stay as listed in §2. Contextual entries are filtered by the ses
 | Records | `records` | `/records/*`, `/restrictions`, `/analytics` | CHR-03, CHR-05, DEAN-05, GUD-03, GUD-04, OSAS-02, OSAS-03, ADM-03 |
 | Admin | `admin` | `/admin/*` | ADM-01, ADM-02, ADM-04, ADM-05, ADM-06 |
 
-The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/`, `/sign-in`, and `/register` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
+The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/` and `/sign-in` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
 
 ### 4.1 Host resolution
 
@@ -349,7 +347,7 @@ The frontend decides which site the current host serves, in this order:
 
 - A route that belongs to another site, when that site has an origin, triggers a full-page redirect to `<origin><path><search>`. If the other site has no origin, the link stays on the current host.
 - Links to another site render as absolute `href`s, including links the design system renders through its provider. The top-bar search opens `/feed?q=` on Forums.
-- `/`, `/sign-in`, and `/register` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
+- `/` and `/sign-in` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
 - The session cookie belongs to the API host (`SameSite=None; Secure` in production), so one sign-in works on all deployed sites, in a browser that allows the API's cross-site cookie. The API accepts the seven site origins through a comma-separated `CORS_ORIGIN`.
 - Prod (`main`, stack `accs-prod`) serves `portal.access-ccs.com`, `forums.access-ccs.com`, and so on; dev (`dev`, stack `accs-dev`) serves `portal-dev.access-ccs.com`, `forums-dev.access-ccs.com`, and so on. The landing site on `access-ccs.com` is prod only. See `architecture/README.md`.
 
@@ -639,4 +637,4 @@ Not used in the app: `Hero`, `Navbar`, `Footer` and `Logo` (marketing sites only
 | D-07 Similarity and agreement thresholds | P23, P24, STU-08 prompt on P06 |
 | D-08 Privacy and retention | P38 standing badge, alias resolution, P12, P34, P51 retention |
 
-Also unspecified: registration flow, password recovery, session expiry, lockout (ALL-01); cancellation and rescheduling rules (STU-05, PRO-04, PRO-05); report categories; announcement priority levels; who publishes academic and campus calendar events; whether flagged posts are held or published with a flag.
+Also unspecified: password recovery, session expiry, lockout (ALL-01); cancellation and rescheduling rules (STU-05, PRO-04, PRO-05); report categories; announcement priority levels; who publishes academic and campus calendar events; whether flagged posts are held or published with a flag.

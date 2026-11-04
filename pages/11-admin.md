@@ -78,7 +78,7 @@ The admin layout guard is `src/routes/_app/admin.tsx`. It lets a person in only 
 | Assign a role to a user | Recorded with actor, time, and reason; applies at next sign-in | ADM-01-V |
 | Missing or invalid assignment | Field errors; no partial permission change | ADM-01-I |
 
-**Open.** Accounts come from the simulated QCU source. How accounts are created and how duplicates are prevented is TBD (ALL-01-F, pending production identity policy).
+**Open.** There is no public registration (team decision, 2026-11-05). Student accounts come from the MIS/registrar list the secretary imports, or are added by the secretary. Other accounts are created by the secretary after the Dean activates the secretary. How duplicates are prevented is TBD (ALL-01-F).
 
 ---
 

@@ -89,19 +89,20 @@ Signed in: redirect to `/home`. Signed out: redirect to `/sign-in`. Keep the cur
 
 **Open.** Email delivery for reset codes, lockout shared across API instances, session length, and QCU identity-provider integration.
 
-### Built sign-in, registration, and password reset
+### Built sign-in and password reset
 
-Files: `src/routes/_auth/sign-in.tsx`, `register.tsx`, `-auth-shell.tsx`, `auth.css`. No app shell, no site list, and no links to internal sites. Split layout from 960 px: a navy brand panel (`DoorPlate` "ACCS | CCS", a headline, three facts; no images) and the form column. Below 960 px the brand panel becomes a compact navy strip above the form.
+There is no public registration. Accounts are created by the secretary or imported from the MIS/registrar list (team decision, 2026-11-05; [delta](../deltas/2026-11-05-consultation-50-percent.md)).
+
+Files: `src/routes/_auth/sign-in.tsx`, `-auth-shell.tsx`, `auth.css`. No app shell, no site list, and no links to internal sites. Split layout from 960 px: a navy brand panel (`DoorPlate` "ACCS | CCS", a headline, three facts; no images) and the form column. Below 960 px the brand panel becomes a compact navy strip above the form.
 
 | Page | Contents |
 |---|---|
-| `/sign-in` | "Email or ID" (email, user ID, or student/employee number), password with show/hide, Remember me (30-day cookie), Forgot password, Sign in (loading state). Errors: `INVALID_CREDENTIALS` "The email, ID, or password is incorrect."; `TOO_MANY_ATTEMPTS` after 5 failures in 15 minutes; network failure. Link to `/register`. |
+| `/sign-in` | "Email or ID" (email, user ID, or student/employee number), password with show/hide, Remember me (30-day cookie), Forgot password, Sign in (loading state). Errors: `INVALID_CREDENTIALS` "The email, ID, or password is incorrect."; `TOO_MANY_ATTEMPTS` after 5 failures in 15 minutes; network failure. |
 | Forgot password | Inline panel swap on `/sign-in`: email or ID, then a 6-digit code (15 minutes, single use) with a new password and confirmation. The API always answers the same way, so it never reveals whether an account exists. No email provider is connected yet; the page says to contact the CCS office if no email arrives. |
-| `/register` | About you (full name, QCU email, student or employee ID `NN-NNNN` / `NNNN-NNNN`), role (Student, Faculty, CCS staff; students also give program, year level 1–4, section A–F), password with a four-step strength meter and confirmation. Chair, dean, guidance, OSAS, President's Office, and administrator access is granted by an administrator, never self-selected. Success signs the person in and opens their landing page. |
 
 Password rule: 10+ characters with upper and lower case, a number, and a symbol. Seeded pilot accounts sign in with their ID or email and the shared pilot password, which each environment sets through the stack parameter `SeedPassword` (Lambda `SEED_PASSWORD`; a built-in default applies to local runs and tests only), which must be rotated or disabled before real users join.
 
-After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` and `/register` are served on every host.
+After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` is served on every host.
 
 ### Local role launcher
 
