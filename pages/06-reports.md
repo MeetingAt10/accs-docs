@@ -78,6 +78,8 @@ These pages belong to the reporting student only. Handlers work on the same reco
 | Started from a discussion | Report keeps the link to the post | STU-08-V |
 | Draft save fails | `Alert tone="danger"` "Couldn't save your draft. Your text is kept on this device." | |
 
+**Concern flow (slice C).** Step 2 adds "Is this concern about your adviser?" (No: it goes to the adviser; Yes: it goes to the Program Chair of the student's program, chosen automatically, and the adviser is not told and cannot open it). The Review step shows who can read the report and two optional checkboxes to also allow the Program Chair and the Dean (both off by default; the chair box is hidden when the concern is about the adviser). "Submit report" opens a consent dialog with the server's exact wording (`consentWording`); the report is sent only after the student agrees, and cancelling sends nothing. The server stores the consent with its time and wording.
+
 **Open.** Report categories; attachments; who may submit (STU-06 "submission permissions need final policy"); route exceptions.
 
 ---
@@ -109,6 +111,9 @@ These pages belong to the reporting student only. Handlers work on the same reco
 | Messages | DS-3 `MessageList` + `MessageComposer` with the handling office | Header shows "You appear as Reporter A-12" while anonymous. |
 | Disclose | `Button variant="secondary"` "Share my name" → APP-5 `DiscloseIdentityDialog` = `Modal role="alertdialog" title="Share your name with the Guidance Office?"` | Body says who will see it and that it is recorded. Disclosure is per office and logged (STU-07). |
 | Source | `Link` "Started from your discussion" (P06) | When converted (STU-08). |
+| How we will talk | `Panel` "How we will talk": four modes (chat, video call, voice call, face-to-face) | Each opens a dialog with its own consent wording and an agree checkbox. Video and voice add an optional "allow recording" checkbox (off unless ticked). Chat has no time. Other modes take an optional preferred date and time; the handler sets the scheduled time, meeting link (https), or place, and the student sees them. The choice can be changed until the report closes. No slot picker yet. |
+| Who can see this | `Panel` listing adviser, Program Chair, Dean, and the consent time | |
+| Messages (chat mode) | The conversation refreshes by polling every 4 seconds; sending is allowed only when the mode is chat | |
 | Help | `Button variant="tertiary" icon="robot"` "What does this stage mean?" → assistant drawer | ALL-04. |
 
 **States**

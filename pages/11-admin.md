@@ -8,6 +8,19 @@ The admin layout guard is `src/routes/_app/admin.tsx`. It lets a person in only 
 
 ---
 
+## Accounts: `/accounts`
+
+No page ID. File `src/routes/_app/accounts.tsx`, screen `src/components/app/accounts.tsx`. Permission `account.activateSecretary` (Dean) or `account.provision` (secretary); the Admin site lists it for both. API: `/api/accounts/*` ([backend README](../../backend/README.md)). Credentials appear once and are never written to the audit trail.
+
+| Role | View |
+|---|---|
+| Dean | "Account types" table (secretary, faculty, advisor, program chair, student) with active and not-active counts. Only the secretary row has an action: Activate, or New sign-in details while the secretary has not signed in yet. A dialog takes a name and email and then shows the username, temporary password, and sign-in link once. Other types read "Managed by the secretary". |
+| Secretary | Tabs: Faculty (search, program filter, add, switch active); Advisors (year level 1 to 4, pick from faculty, several years per person); Program chairs (IS, CS, IT, pick from that program's faculty); Students (import a class list from Excel, add one student, list with search and switch active). |
+
+Student import reads the file in the browser (`read-excel-file`), checks each row, and creates accounts in batches of 25, then offers the sign-in details as a CSV, shown once; leaving the page before saving them asks for confirmation. Column names are assumptions until a sample MIS file is available. No email is sent: the person on screen passes the details on.
+
+---
+
 ## P45 Admin overview: `/admin`
 
 | | |
