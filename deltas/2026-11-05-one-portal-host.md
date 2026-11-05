@@ -1,6 +1,6 @@
 # Delta: one portal host, no module subdomains
 
-**Status:** in progress, 2026-11-05
+**Status:** implemented, 2026-11-05
 **Replaces:** [`2026-11-01-subdomain-sites.md`](2026-11-01-subdomain-sites.md) for hosting. The seven module sites stay as navigation groups.
 
 ## Existing behavior touched
@@ -32,3 +32,7 @@ Team decision: the modules sit behind sign-in, so they gain nothing from their o
 4. The six old hostnames no longer resolve on either stack, and the four kept sites still respond.
 5. `dev.access-ccs.com` serves the landing site from the `dev` branch.
 6. Frontend, landing and team builds and tests pass.
+
+## Fold-in record
+
+- Folded into `sitemap.md` §1 and §4, `architecture/README.md` and `frontend/README.md` on 2026-11-05.

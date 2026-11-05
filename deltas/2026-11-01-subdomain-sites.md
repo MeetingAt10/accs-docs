@@ -1,5 +1,7 @@
 # Delta: module sites on separate hosts, and the shell redesign
 
+> **Superseded for hosting** by [2026-11-05-one-portal-host.md](2026-11-05-one-portal-host.md): the module sites are now paths on the portal host.
+
 **Status:** in progress, 2026-11-01
 **Superseded in part:** the site switcher row, site hero, Home site directory, and demo-account sign-in below are replaced by [`2026-11-01-real-auth-and-visual-refactor.md`](2026-11-01-real-auth-and-visual-refactor.md) (site rail, no illustration art, real sign-in and registration, role-gated sites).
 **Authoritative source:** `DOC003_MODULE-INVENTORY.xlsm`, Module Inventory sheet (58 modules)
