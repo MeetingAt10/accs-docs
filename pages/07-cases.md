@@ -79,6 +79,8 @@ Handlers see a report only while it is at their stage (or in their program for t
 | Body | `Grid columns="main"` | |
 | Tabs (main) | `Tabs`: Report, Messages, Notes, History | |
 | Report | `dl.ds-record__facts` (reference, category, severity, program, submitted, reporter name or alias, identity mode, linked discussion), narrative in `.ds-prose`, attachments | |
+| How we will talk | `HandlerTalk` panel: the student's chosen mode, consent time, recording choice, and suggested time | For video or voice a form sets date and time and an https meeting link; for face-to-face, date and time and place. At least one field is needed; the student is notified. Chat has no form. |
+| Consent and sharing | `AccessPanel`: consent time, whether the Program Chair or Dean were also allowed, a note when the concern is about the adviser, and what the student agreed to | |
 | Messages | DS-3 `MessageList` + `MessageComposer` with the reporter; `PrivacyNotice` "The reporter sees messages you send here." | Alias until the reporter discloses (STU-07). |
 | Notes | APP-8 `CaseNotes`: notes with `Badge form="restricted"` "Internal", `TextArea label="Add a note"`, `Button` "Save note"; `PrivacyNotice` "Internal notes never appear in the reporter's timeline." | GUD-02-B. |
 | History | `CaseTimeline` (actor role, action, reason, time); entries the reporter can see carry `Badge outline marker={false}` "Shown to reporter" | Route history and conflict reason (CHR-02). |
@@ -116,6 +118,8 @@ Handlers see a report only while it is at their stage (or in their program for t
 | OSAS accepts a transfer and records an action | Officer, time, stage, and a public-safe milestone saved | OSAS-01-V |
 | Transfer without an authorized rule or reason | Not offered; no silent stage change | OSAS-01-B |
 | Executive action with an undefined power | Not offered until the rule exists | PRES-02-B |
+
+**Who sees a concern.** The adviser reads it unless the student marked it as about the adviser; the Program Chair when allowed or when it is about the adviser; the Dean only when allowed. Moving it to the Dean when the student did not allow that is refused. The queue (P21), groups (P23, P24), and counts (P25) apply the same rule. Chat messages are accepted only when the student chose chat, and refresh by polling.
 
 **Open.** Allowed transitions and bypass (D-04); what earlier handlers keep; whether any handler may resolve an alias (D-08); required fields per action.
 

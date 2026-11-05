@@ -16,7 +16,7 @@
 | S5 | `DOC005_BLACK-BOX-TEST-BLUEPRINT.docx` (2026-10-23) | Valid, invalid, and boundary cases (183) each page must pass |
 | S6 | `meetingatten-design-system` v1.0.1 specs (`components/**`) and React exports | Component names, variants, states |
 
-Prototype limits from S1: CCS only (IT, CS, IS); web only; official QCU email only, no personal phone or external messaging; simulated enrollment data and sample records, no live registrar connection (Delimitation 5); the AI assistant supports processes and never decides. The registration flow, password recovery, lockout, and session expiry are TBD (S5 ALL-01-F, G, K, L).
+Prototype limits from S1: CCS only (IT, CS, IS); web only; official QCU email only, no personal phone or external messaging; simulated enrollment data and sample records, no live registrar connection (Delimitation 5); the AI assistant supports processes and never decides. There is no public registration (team decision, 2026-11-05): student accounts come from the MIS/registrar list the secretary imports, or are added by the secretary, and other accounts are created by the secretary after the Dean activates the secretary. Password recovery, lockout, and session expiry are TBD (S5 ALL-01-G, K, L).
 
 ## How the app is organized
 
@@ -28,7 +28,7 @@ One app, one set of routes, organized by feature. The same build is served on se
 
 RBAC is objective 2 and scope item 1 of the paper (S1), and "Role-Based Access Control" is in its definition of terms.
 
-### 1.1 The ten roles
+### 1.1 The eleven roles
 
 | # | Role | Who | Scope attribute | Pilot accounts (S5 fixtures) |
 |---|---|---|---|---|
@@ -42,8 +42,9 @@ RBAC is objective 2 and scope item 1 of the paper (S1), and "Role-Based Access C
 | 8 | Guidance | Guidance Office personnel | Case Files at the Guidance stage; students in Guidance cases | 1 |
 | 9 | OSAS | Office of Student Affairs and Services personnel | cases transferred to OSAS; students under OSAS authority | 1 |
 | 10 | Office of the University President | Authorized executive office user | executive-stage cases only | 1 |
+| 11 | Secretary (Sec in the matrices) | CCS office secretary | account provisioning | 1 (`QCU-SECRETARY`, inactive until the Dean activates it) |
 
-The paper's survey population (3.1.3) lists six groups: students, professors, Program Chairs, Dean, Guidance, and OSAS. Organization, Staff, Administrator, and President accounts are system roles, not survey respondents. 3.1.3 says "San Bartolome Campus" while Delimitation 1 says "Main Campus"; the paper should settle on one.
+The paper's survey population (3.1.3) lists six groups: students, professors, Program Chairs, Dean, Guidance, and OSAS. Organization, Staff, Administrator, President, and Secretary accounts are system roles, not survey respondents. The Dean activates the Secretary; the Secretary creates and switches faculty, student, and Program Chair accounts and assigns advisers (year levels 1 to 4) and chairs (IS, CS, IT). Faculty and adviser are one account: the Professor role plus adviser assignments. Only the Dean and Secretary open `/accounts`. 3.1.3 says "San Bartolome Campus" while Delimitation 1 says "Main Campus"; the paper should settle on one.
 
 ### 1.2 Access is role plus relationship
 
@@ -54,7 +55,8 @@ The paper's survey population (3.1.3) lists six groups: students, professors, Pr
 | Program | A Program Chair sees only their program's sections, reports, analytics, evaluations, and offense records. | CHR-01 to CHR-05 |
 | Case stage | Dean, Guidance, OSAS, and President see a case only from the stage where it reached them. | DEAN-02, GUD-01, OSAS-01, PRES-01 |
 | Ownership | A student sees only their own reports, requests, evaluations, to-dos, and standing. | STU-04, STU-05, STU-09, STU-11 |
-| Conflict | A report naming the student's adviser bypasses that adviser, who must not see it; it goes to the Program Chair. | PRO-06, CHR-02 |
+| Conflict | A concern the student marks as about their adviser, or one that names the adviser, bypasses that adviser, who is not told and must not see it; it goes to the Program Chair of the student's program, chosen automatically. | PRO-06, CHR-02 |
+| Consent | The student agrees to a consent form before a concern is sent; without it nothing is stored. The adviser reads it by default; the Program Chair and the Dean only if the student allows it (the chair also reads it when it is about the adviser). | slice C of the [50% delta](deltas/2026-11-05-consultation-50-percent.md) |
 | Account state | A restricted student loses only the restricted features (posting, commenting, anonymous reporting) and keeps announcements, academic information, the assistant, and permitted professor messages. | STU-11, ADM-03, US-49 |
 
 ### 1.3 Rules
@@ -66,7 +68,8 @@ The paper's survey population (3.1.3) lists six groups: students, professors, Pr
 5. **Anonymous is not unaccountable.** Anonymous posts and reports still belong to a verified account; the identity is hidden only from audiences that should not see it (workflow rule 5).
 6. **People decide.** The assistant, word filters, and similarity summaries never apply restrictions, offenses, or case outcomes (workflow rule 7).
 7. **Audit.** Role changes, restrictions, case transitions, moderation decisions, identity disclosures, and every opening of an offense record are logged with who, what, and when (ADM-01, CHR-05, DEAN-05, OSAS-02).
-8. **Notifications leak nothing.** A notification names the kind of event, never confidential details, and opening it re-checks access (ALL-05).
+8. **First sign-in.** An account made by the Secretary, and the Secretary once activated, has temporary credentials. Until the person sets a new username and password at `/first-login`, every other page and API route is refused. Sign-in accepts the username as well as the email or ID.
+9. **Notifications leak nothing.** A notification names the kind of event, never confidential details, and opening it re-checks access (ALL-05).
 
 ### 1.4 Who can see or reach whom
 
@@ -86,7 +89,7 @@ The paper's survey population (3.1.3) lists six groups: students, professors, Pr
 
 | Record | Who sees it |
 |---|---|
-| A student's report | The student; the handler at the current stage; earlier handlers keep their own history entries. Never the conflicted adviser. |
+| A student's report | The student; the adviser, unless the concern is about them; the Program Chair if the student allowed it or the concern is about the adviser; the Dean only if the student allowed it; Guidance, OSAS, and the President's Office once a case reaches them. Earlier handlers keep their own history entries. Never the conflicted adviser. |
 | Internal case notes | Handlers with case access; never the reporter's timeline (GUD-02). |
 | Public-safe milestones | The reporter and handlers (STU-09). |
 | Offense history | Program Chair (program), Dean (college), Guidance and OSAS (authorized students). Each opening is logged. Never peers, never public profiles. |
@@ -94,45 +97,49 @@ The paper's survey population (3.1.3) lists six groups: students, professors, Pr
 | Evaluation answers | Nobody individually; professors, Chairs, and the Dean see published aggregates within scope (STU-10, PRO-08). |
 | Personal to-dos | The owner only (STU-04). |
 
+**How the student talks about a concern.** The student picks one mode, each with its own consent: system chat (two-way, refreshed by polling), video call, voice call, or face-to-face. Video and voice also ask for consent to record, off unless the student agrees. The student gives a preferred date and time; the handler sets the scheduled time, meeting link (https only), or place. Booking the handler's open slots exists in the API but the screen has no slot picker yet. Messages are allowed only in chat mode. The student can change the mode; each consent is kept.
+
 **Identity visibility of anonymous participants** (STU-02, STU-07, workflow rule 5): classmates and handlers see an alias; the verified account stays linked in authorized records. Which roles may resolve the alias (for example moderators or Guidance) is not defined; it belongs to D-08. A reporter's disclosure is an explicit, logged action, per handler.
 
 ### 1.5 Permission matrix
 
 ✓ = allowed · S = within the role's scope (1.1) · O = own records only · — = not allowed · † = proposed, depends on an open decision (mostly D-06).
 
-| Key | Permission | Stu | Org | Prof | Staff | Chair | Dean | Admin | Guid | OSAS | Pres |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| `feed.read` | Read feed and announcements | S | S | S | S | S | S | ✓ | S | S | S |
-| `post.create` | Post and comment | S | S | S | † | S | S | — | S | S | — |
-| `post.anonymous` | Post or comment anonymously | S | — | — | — | — | — | — | — | — | — |
-| `announcement.publish` | Publish announcements | — | org | class | † | program | college | — | — | — | — |
-| `message.send` | Direct and group messages | S | † | S | † | S | S | — | S | S | — |
-| `roster.view` | View rosters | own sections | members | handled | — | program | college | — | — | — | — |
-| `calendar.view` | View calendars | ✓ | S† | ✓ | — | ✓ | ✓ | — | ✓ | ✓ | — |
-| `todo.manage` | Personal to-dos | O | — | — | — | — | — | — | — | — | — |
-| `consultation.request` | Request consultation | ✓ | — | — | — | — | — | — | — | — | — |
-| `consultation.decide` | Manage availability, decide requests | — | — | O | — | — | — | — | — | — | — |
-| `report.create` | Submit report | ✓ | — | — | — | — | — | — | — | — | — |
-| `report.viewOwn` | View own reports, disclose identity | O | — | — | — | — | — | — | — | — | — |
-| `case.view` | View routed reports or cases | — | — | assigned | — | program | Dean stage | — | Guidance stage | OSAS stage | executive stage |
-| `case.act` | Respond, record action, escalate, transfer, resolve | — | — | assigned | — | program | Dean stage | — | Guidance stage | OSAS stage | executive stage |
-| `case.convert` | Convert a report to a Case File | — | — | — | — | — | — | — | ✓ | — | — |
-| `cluster.review` | Review similar-report groups | — | — | — | — | program | † | — | † | † | — |
-| `analytics.view` | Grievance analytics | — | — | — | — | program | college | — | — | — | — |
-| `evaluation.fill` | Fill evaluations | assigned | — | peer, upward | — | † | † | — | — | — | — |
-| `evaluation.review` | Review proposed questions | — | — | ✓ | — | † | — | — | — | — | — |
-| `evaluation.configure` | Configure and publish cycles | — | — | — | — | — | ✓ | — | — | — | — |
-| `evaluation.results` | View published results | — | — | own | — | program | college | — | — | — | — |
-| `offense.view` | View offense history | — | — | — | — | program | college | — | S | S | — |
-| `goodmoral.review` | Record Good Moral prerequisite status | — | — | — | — | — | — | — | S | S | — |
-| `restriction.manage` | Apply or lift restrictions | — | — | — | — | — | — | ✓ | refer † | S † | — |
-| `standing.viewOwn` | View own account standing | O | — | — | — | — | — | — | — | — | — |
-| `moderation.review` | Review flagged and reported content | — | — | — | — | — | — | ✓ | — | — | — |
-| `role.manage` | Assign roles, configure permissions | — | — | — | — | — | — | ✓ | — | — | — |
-| `audit.view` | Audit, adoption, assistant, uptime | — | — | — | — | — | — | ✓ | — | — | — |
-| `directory.view` | Directory and profiles | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `self.manage` | Own profile, notifications, settings | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `assistant.use` | AI assistant (answers within own access) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Key | Permission | Stu | Org | Prof | Staff | Chair | Dean | Admin | Guid | OSAS | Pres | Sec |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `feed.read` | Read feed and announcements | S | S | S | S | S | S | ✓ | S | S | S | ✓ |
+| `post.create` | Post and comment | S | S | S | † | S | S | — | S | S | — | — |
+| `post.anonymous` | Post or comment anonymously | S | — | — | — | — | — | — | — | — | — | — |
+| `announcement.publish` | Publish announcements | — | org | class | † | program | college | — | — | — | — | — |
+| `message.send` | Direct and group messages | S | † | S | † | S | S | — | S | S | — | — |
+| `roster.view` | View rosters | own sections | members | handled | — | program | college | — | — | — | — | — |
+| `calendar.view` | View calendars | ✓ | S† | ✓ | — | ✓ | ✓ | — | ✓ | ✓ | — | — |
+| `todo.manage` | Personal to-dos | O | — | — | — | — | — | — | — | — | — | — |
+| `consultation.request` | Request consultation | ✓ | — | — | — | — | — | — | — | — | — | — |
+| `consultation.decide` | Manage availability, decide requests | — | — | O | — | — | — | — | — | — | — | — |
+| `report.create` | Submit report | ✓ | — | — | — | — | — | — | — | — | — | — |
+| `report.viewOwn` | View own reports, disclose identity | O | — | — | — | — | — | — | — | — | — | — |
+| `case.view` | View routed reports or cases | — | — | assigned | — | program | Dean stage | — | Guidance stage | OSAS stage | executive stage | — |
+| `case.act` | Respond, record action, escalate, transfer, resolve | — | — | assigned | — | program | Dean stage | — | Guidance stage | OSAS stage | executive stage | — |
+| `case.convert` | Convert a report to a Case File | — | — | — | — | — | — | — | ✓ | — | — | — |
+| `cluster.review` | Review similar-report groups | — | — | — | — | program | † | — | † | † | — | — |
+| `analytics.view` | Grievance analytics | — | — | — | — | program | college | — | — | — | — | — |
+| `evaluation.fill` | Fill evaluations | assigned | — | peer, upward | — | † | † | — | — | — | — | — |
+| `evaluation.review` | Review proposed questions | — | — | ✓ | — | † | — | — | — | — | — | — |
+| `evaluation.configure` | Configure and publish cycles | — | — | — | — | — | ✓ | — | — | — | — | — |
+| `evaluation.results` | View published results | — | — | own | — | program | college | — | — | — | — | — |
+| `offense.view` | View offense history | — | — | — | — | program | college | — | S | S | — | — |
+| `goodmoral.review` | Record Good Moral prerequisite status | — | — | — | — | — | — | — | S | S | — | — |
+| `restriction.manage` | Apply or lift restrictions | — | — | — | — | — | — | ✓ | refer † | S † | — | — |
+| `standing.viewOwn` | View own account standing | O | — | — | — | — | — | — | — | — | — | — |
+| `moderation.review` | Review flagged and reported content | — | — | — | — | — | — | ✓ | — | — | — | — |
+| `role.manage` | Assign roles, configure permissions | — | — | — | — | — | — | ✓ | — | — | — | — |
+| `audit.view` | Audit, adoption, assistant, uptime | — | — | — | — | — | — | ✓ | — | — | — | — |
+| `directory.view` | Directory and profiles | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `self.manage` | Own profile, notifications, settings | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `assistant.use` | AI assistant (answers within own access) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `account.activateSecretary` | Activate the secretary account and issue its sign-in details | — | — | — | — | — | ✓ | — | — | — | — | — |
+| `account.provision` | Create and switch faculty, student, and chair accounts; assign advisers and chairs | — | — | — | — | — | — | — | — | — | — | ✓ |
 
 Sources: S2 module rows, S3 stories and workflow rules. "refer" means Guidance reviews and refers an apply or lift decision (GUD-04). Who may apply restrictions also depends on D-05. Chair and Dean evaluation forms are TBD: scope item 5 says evaluations run "among faculty, Program Chairs, and the Dean" without naming the forms.
 
@@ -151,7 +158,8 @@ accs-landing (public, separate site)
 accs-system/frontend
 ├── P01 /                               Redirect: /home when signed in, else /sign-in
 ├── P02 /sign-in                        Sign in, forgot password (no app shell)
-├──     /register                       Create an account: student, faculty, CCS staff (no app shell)
+│        /first-login                   Choose username and password (temporary credentials only)
+│        /accounts                      Accounts (Dean: activate secretary; Secretary: manage accounts)
 │        (not found, error, and restricted are states inside the shell, not routes)
 │
 ├── P03 /home                           Dashboard, one page with role variants
@@ -233,8 +241,7 @@ src/routes/
 ├── __root.tsx                      DesignSystemProvider, ToastRegion (exists)
 ├── index.tsx                       P01 redirect
 ├── _auth.tsx                       Layout without the shell
-│   ├── _auth/sign-in.tsx           P02
-│   └── _auth/register.tsx          Registration
+│   └── _auth/sign-in.tsx           P02
 ├── _app.tsx                        AppShell + session guard (redirects to /sign-in?redirect=…)
 └── _app/
     ├── home.tsx                                    P03
@@ -265,53 +272,55 @@ Each route declares its permission key in `beforeLoad` (for example `requirePerm
 
 ✓ = full use for that role · S = scoped (1.1) · O = own records only · R = read only · † = proposed, open decision · — = restricted state, nothing revealed.
 
-| ID | Route | Stu | Org | Prof | Staff | Chair | Dean | Admin | Guid | OSAS | Pres |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| P01 | `/` | → | → | → | → | → | → | → | → | → | → |
-| P02 | `/sign-in` | signed-out visitors | | | | | | | | | |
-| P03 | `/home` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | → P45 | ✓ | ✓ | ✓ |
-| P04 | `/feed` | S | S | S | S | S | S | R | S | S | R |
-| P05 | `/feed/new` | S | S | S | † | S | S | — | S | S | — |
-| P06 | `/feed/$postId` | S | S | S | R | S | S | R | S | S | R |
-| P07 | `/spaces` | O | — | S | — | S | S | — | — | — | — |
-| P08 | `/spaces/$spaceId` | S | — | S | — | R | R | — | — | — | — |
-| P09 | `/organizations` | R | R | R | R | R | R | R | R | R | R |
-| P10 | `/organizations/$orgId` | S | ✓† | R | R | R | R | R | R | R | R |
-| P11 | `/messages` | ✓ | † | ✓ | † | ✓ | ✓ | — | ✓ | ✓ | — |
-| P12 | `/messages/$threadId` | S | † | S | † | S | S | — | S | S | — |
-| P13 | `/calendar` | ✓ | S† | ✓ | — | R | R | — | R | R | — |
-| P14 | `/consultations` | O | — | O | — | — | — | — | — | — | — |
-| P15 | `/consultations/faculty/$facultyId` | S | — | — | — | — | — | — | — | — | — |
-| P16 | `/consultations/requests/$requestId` | O | — | O | — | — | — | — | — | — | — |
-| P17 | `/consultations/availability` | — | — | O | — | — | — | — | — | — | — |
-| P18 | `/reports` | O | — | — | — | — | — | — | — | — | — |
-| P19 | `/reports/new` | ✓ | — | — | — | — | — | — | — | — | — |
-| P20 | `/reports/$reportId` | O | — | — | — | — | — | — | — | — | — |
-| P21 | `/cases` | — | — | S | — | S | S | — | S | S | S |
-| P22 | `/cases/$caseId` | — | — | S | — | S | S | — | S | S | S |
-| P23 | `/cases/clusters` | — | — | — | — | S | † | — | † | † | — |
-| P24 | `/cases/clusters/$clusterId` | — | — | — | — | S | † | — | † | † | — |
-| P25 | `/analytics` | — | — | — | — | S | ✓ | — | — | — | — |
-| P26 | `/evaluations` | O | — | O | — | † | ✓ | — | — | — | — |
-| P27 | `/evaluations/forms/$assignmentId` | O | — | O | — | † | † | — | — | — | — |
-| P28 | `/evaluations/results` | — | — | O | — | S | ✓ | — | — | — | — |
-| P29 | `/evaluations/results/$facultyId` | — | — | O | — | S | ✓ | — | — | — | — |
-| P30 | `/evaluations/cycles` | — | — | — | — | — | ✓ | — | — | — | — |
-| P31 | `/evaluations/cycles/$cycleId` | — | — | — | — | — | ✓ | — | — | — | — |
-| P32 | `/evaluations/cycles/$cycleId/review` | — | — | O | — | † | — | — | — | — | — |
-| P33 | `/records` | — | — | — | — | S | S | — | S | S | — |
-| P34 | `/records/$studentId` | — | — | — | — | S | S | — | S | S | — |
-| P35 | `/restrictions` | — | — | — | — | — | — | ✓ | S | S | — |
-| P36 | `/standing` | O | — | — | — | — | — | — | — | — | — |
-| P37 | `/directory` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| P38 | `/people/$userId` | R | R | R | R | R | R | R | R | R | R |
-| P39 | `/profile` | O | O | O | O | O | O | O | O | O | O |
-| P40 | `/notifications` | O | O | O | O | O | O | O | O | O | O |
-| P41 | `/assistant` | S | S | S | S | S | S | S | S | S | S |
-| P42 | `/help` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| P43 | `/settings` | O | O | O | O | O | O | O | O | O | O |
-| P44 | `/settings/notifications` | O | O | O | O | O | O | O | O | O | O |
-| P45–P52 | `/admin/**` | — | — | — | — | — | — | ✓ | — | — | — |
+| ID | Route | Stu | Org | Prof | Staff | Chair | Dean | Admin | Guid | OSAS | Pres | Sec |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| P01 | `/` | → | → | → | → | → | → | → | → | → | → | → |
+| P02 | `/sign-in` | signed-out visitors | | | | | | | | | | |
+| P03 | `/home` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | → P45 | ✓ | ✓ | ✓ | ✓ |
+| P04 | `/feed` | S | S | S | S | S | S | R | S | S | R | R |
+| P05 | `/feed/new` | S | S | S | † | S | S | — | S | S | — | — |
+| P06 | `/feed/$postId` | S | S | S | R | S | S | R | S | S | R | R |
+| P07 | `/spaces` | O | — | S | — | S | S | — | — | — | — | — |
+| P08 | `/spaces/$spaceId` | S | — | S | — | R | R | — | — | — | — | — |
+| P09 | `/organizations` | R | R | R | R | R | R | R | R | R | R | R |
+| P10 | `/organizations/$orgId` | S | ✓† | R | R | R | R | R | R | R | R | R |
+| P11 | `/messages` | ✓ | † | ✓ | † | ✓ | ✓ | — | ✓ | ✓ | — | — |
+| P12 | `/messages/$threadId` | S | † | S | † | S | S | — | S | S | — | — |
+| P13 | `/calendar` | ✓ | S† | ✓ | — | R | R | — | R | R | — | — |
+| P14 | `/consultations` | O | — | O | — | — | — | — | — | — | — | — |
+| P15 | `/consultations/faculty/$facultyId` | S | — | — | — | — | — | — | — | — | — | — |
+| P16 | `/consultations/requests/$requestId` | O | — | O | — | — | — | — | — | — | — | — |
+| P17 | `/consultations/availability` | — | — | O | — | — | — | — | — | — | — | — |
+| P18 | `/reports` | O | — | — | — | — | — | — | — | — | — | — |
+| P19 | `/reports/new` | ✓ | — | — | — | — | — | — | — | — | — | — |
+| P20 | `/reports/$reportId` | O | — | — | — | — | — | — | — | — | — | — |
+| P21 | `/cases` | — | — | S | — | S | S | — | S | S | S | — |
+| P22 | `/cases/$caseId` | — | — | S | — | S | S | — | S | S | S | — |
+| P23 | `/cases/clusters` | — | — | — | — | S | † | — | † | † | — | — |
+| P24 | `/cases/clusters/$clusterId` | — | — | — | — | S | † | — | † | † | — | — |
+| P25 | `/analytics` | — | — | — | — | S | ✓ | — | — | — | — | — |
+| P26 | `/evaluations` | O | — | O | — | † | ✓ | — | — | — | — | — |
+| P27 | `/evaluations/forms/$assignmentId` | O | — | O | — | † | † | — | — | — | — | — |
+| P28 | `/evaluations/results` | — | — | O | — | S | ✓ | — | — | — | — | — |
+| P29 | `/evaluations/results/$facultyId` | — | — | O | — | S | ✓ | — | — | — | — | — |
+| P30 | `/evaluations/cycles` | — | — | — | — | — | ✓ | — | — | — | — | — |
+| P31 | `/evaluations/cycles/$cycleId` | — | — | — | — | — | ✓ | — | — | — | — | — |
+| P32 | `/evaluations/cycles/$cycleId/review` | — | — | O | — | † | — | — | — | — | — | — |
+| P33 | `/records` | — | — | — | — | S | S | — | S | S | — | — |
+| P34 | `/records/$studentId` | — | — | — | — | S | S | — | S | S | — | — |
+| P35 | `/restrictions` | — | — | — | — | — | — | ✓ | S | S | — | — |
+| P36 | `/standing` | O | — | — | — | — | — | — | — | — | — | — |
+| P37 | `/directory` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| P38 | `/people/$userId` | R | R | R | R | R | R | R | R | R | R | R |
+| P39 | `/profile` | O | O | O | O | O | O | O | O | O | O | O |
+| P40 | `/notifications` | O | O | O | O | O | O | O | O | O | O | O |
+| P41 | `/assistant` | S | S | S | S | S | S | S | S | S | S | S |
+| P42 | `/help` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| P43 | `/settings` | O | O | O | O | O | O | O | O | O | O | O |
+| P44 | `/settings/notifications` | O | O | O | O | O | O | O | O | O | O | O |
+| P45–P52 | `/admin/**` | — | — | — | — | — | — | ✓ | — | — | — | — |
+| — | `/first-login` | any signed-in account with temporary sign-in details | | | | | | | | | | |
+| — | `/accounts` | — | — | — | — | — | ✓ | — | — | — | — | ✓ |
 
 A Chair or Dean who also teaches gets the Professor column as well (rule 3).
 
@@ -321,7 +330,7 @@ A Chair or Dean who also teaches gets the Professor column as well (rule 3).
 
 The signed-in app is split into seven module sites in this fixed order: **Home**, **Forums**, **Schedule**, **Cases**, **Evaluations**, **Records**, **Admin**. This replaces the four-area model (Home, Community, Schedule, Workspace) of the [2026-10-27 delta](deltas/2026-10-27-shared-navigation.md); see [deltas/2026-11-01-subdomain-sites.md](deltas/2026-11-01-subdomain-sites.md). A site is a host and navigation boundary, not an authorization boundary: routes, page IDs, permissions, and API checks do not change, and the same build is served on all seven hosts.
 
-A site appears only when the person's role may open it (`siteRoles` in `src/lib/sites.ts`: Admin is administrator-only; Records is chair, dean, guidance, OSAS, President's Office, and administrator) and the session has an allowed destination in it. A path or host outside that set shows the Access denied page. On desktop, the sites appear as icons in the left site rail, and the left sidebar shows the current site's contextual destinations. On mobile, the drawer starts with a **Sites** section, followed by the current site's destinations. Each site link goes to the site's first permitted landing route.
+A site appears only when the person's role may open it (`siteRoles` in `src/lib/sites.ts`: Admin is for administrators, plus the Dean and Secretary for `/accounts`; Records is chair, dean, guidance, OSAS, President's Office, and administrator) and the session has an allowed destination in it. A path or host outside that set shows the Access denied page. On desktop, the sites appear as icons in the left site rail, and the left sidebar shows the current site's contextual destinations. On mobile, the drawer starts with a **Sites** section, followed by the current site's destinations. Each site link goes to the site's first permitted landing route.
 
 The route URLs stay as listed in §2. Contextual entries are filtered by the session's `allowedPages` and role-specific labels. This filtering helps people find pages; it does not grant access. The route guard and API continue to enforce permission and relationship checks independently.
 
@@ -333,9 +342,9 @@ The route URLs stay as listed in §2. Contextual entries are filtered by the ses
 | Cases | `cases` | `/reports/*`, `/cases/*` | STU-06, STU-07, STU-08, STU-09, PRO-06, CHR-02, CHR-07, DEAN-02, GUD-01, GUD-02, OSAS-01, PRES-01, PRES-02 |
 | Evaluations | `evaluations` | `/evaluations/*` | STU-10, PRO-07, PRO-08, CHR-04, DEAN-03, DEAN-04 |
 | Records | `records` | `/records/*`, `/restrictions`, `/analytics` | CHR-03, CHR-05, DEAN-05, GUD-03, GUD-04, OSAS-02, OSAS-03, ADM-03 |
-| Admin | `admin` | `/admin/*` | ADM-01, ADM-02, ADM-04, ADM-05, ADM-06 |
+| Admin | `admin` | `/admin/*`, `/accounts` | ADM-01, ADM-02, ADM-04, ADM-05, ADM-06 |
 
-The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/`, `/sign-in`, and `/register` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
+The 58 DOC003 modules are assigned to exactly one site each. ADM-03 is on Records because its page, P35 `/restrictions`, lives there. STU-08 is counted once, under Cases, although its prompt appears on P06 in Forums. `/` and `/sign-in` are served on every host, and a path that no site claims belongs to Home. The UI says "Home"; `portal` is only the host label, because the adviser asked on 2026-09-30 to drop "portal" from the product title. `src/lib/sites.test.ts` and `backend/tests/doc003-modules.test.ts` check this mapping against DOC003 (see `frontend/README.md`).
 
 ### 4.1 Host resolution
 
@@ -349,7 +358,7 @@ The frontend decides which site the current host serves, in this order:
 
 - A route that belongs to another site, when that site has an origin, triggers a full-page redirect to `<origin><path><search>`. If the other site has no origin, the link stays on the current host.
 - Links to another site render as absolute `href`s, including links the design system renders through its provider. The top-bar search opens `/feed?q=` on Forums.
-- `/`, `/sign-in`, and `/register` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
+- `/` and `/sign-in` are served on every host and are never redirected to another site. After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator).
 - The session cookie belongs to the API host (`SameSite=None; Secure` in production), so one sign-in works on all deployed sites, in a browser that allows the API's cross-site cookie. The API accepts the seven site origins through a comma-separated `CORS_ORIGIN`.
 - Prod (`main`, stack `accs-prod`) serves `portal.access-ccs.com`, `forums.access-ccs.com`, and so on; dev (`dev`, stack `accs-dev`) serves `portal-dev.access-ccs.com`, `forums-dev.access-ccs.com`, and so on. The landing site on `access-ccs.com` is prod only. See `architecture/README.md`.
 
@@ -366,7 +375,7 @@ Used by P18–P25 and the home dashboards. Sources: workflow rules 2 and 3, PRO-
 | Stage | Handler | Entry | Actions (proposed from module specs) |
 |---|---|---|---|
 | 1 Adviser | Assigned adviser or appropriate professor | New report (default route) | Respond, record next action, escalate to Chair, resolve |
-| 2 Program Chair | Chair of the reporter's program | Escalation from stage 1, or **bypass** when the adviser may be involved | Triage, record action, resolve, escalate to Dean |
+| 2 Program Chair | Chair of the reporter's program | Escalation from stage 1, or **bypass** when the adviser may be involved or the student says the concern is about the adviser | Triage, record action, resolve, escalate to Dean |
 | 3 Dean | CCS Dean | Escalation from stage 2 | Record decision, resolve, transfer to Guidance or another authorized stage |
 | 4 Guidance | Guidance Office | Transfer; the report becomes a **Case File** here | Convert to Case File, notes, milestones, resolve, transfer to OSAS |
 | 5 OSAS | OSAS | Transfer from Guidance | Record action, milestones, resolve, transfer to the President's Office |
@@ -639,4 +648,4 @@ Not used in the app: `Hero`, `Navbar`, `Footer` and `Logo` (marketing sites only
 | D-07 Similarity and agreement thresholds | P23, P24, STU-08 prompt on P06 |
 | D-08 Privacy and retention | P38 standing badge, alias resolution, P12, P34, P51 retention |
 
-Also unspecified: registration flow, password recovery, session expiry, lockout (ALL-01); cancellation and rescheduling rules (STU-05, PRO-04, PRO-05); report categories; announcement priority levels; who publishes academic and campus calendar events; whether flagged posts are held or published with a flag.
+Also unspecified: password recovery, session expiry, lockout (ALL-01); cancellation and rescheduling rules (STU-05, PRO-04, PRO-05); report categories; announcement priority levels; who publishes academic and campus calendar events; whether flagged posts are held or published with a flag.

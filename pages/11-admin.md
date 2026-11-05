@@ -8,6 +8,19 @@ The admin layout guard is `src/routes/_app/admin.tsx`. It lets a person in only 
 
 ---
 
+## Accounts: `/accounts`
+
+No page ID. File `src/routes/_app/accounts.tsx`, screen `src/components/app/accounts.tsx`. Permission `account.activateSecretary` (Dean) or `account.provision` (secretary); the Admin site lists it for both. API: `/api/accounts/*` ([backend README](../../backend/README.md)). Credentials appear once and are never written to the audit trail.
+
+| Role | View |
+|---|---|
+| Dean | "Account types" table (secretary, faculty, advisor, program chair, student) with active and not-active counts. Only the secretary row has an action: Activate, or New sign-in details while the secretary has not signed in yet. A dialog takes a name and email and then shows the username, temporary password, and sign-in link once. Other types read "Managed by the secretary". |
+| Secretary | Tabs: Faculty (search, program filter, add, switch active); Advisors (year level 1 to 4, pick from faculty, several years per person); Program chairs (IS, CS, IT, pick from that program's faculty); Students (import a class list from Excel, add one student, list with search and switch active). |
+
+Student import reads the file in the browser (`read-excel-file`), checks each row, and creates accounts in batches of 25, then offers the sign-in details as a CSV, shown once; leaving the page before saving them asks for confirmation. Column names are assumptions until a sample MIS file is available. No email is sent: the person on screen passes the details on.
+
+---
+
 ## P45 Admin overview: `/admin`
 
 | | |
@@ -78,7 +91,7 @@ The admin layout guard is `src/routes/_app/admin.tsx`. It lets a person in only 
 | Assign a role to a user | Recorded with actor, time, and reason; applies at next sign-in | ADM-01-V |
 | Missing or invalid assignment | Field errors; no partial permission change | ADM-01-I |
 
-**Open.** Accounts come from the simulated QCU source. How accounts are created and how duplicates are prevented is TBD (ALL-01-F, pending production identity policy).
+**Open.** There is no public registration (team decision, 2026-11-05). Student accounts come from the MIS/registrar list the secretary imports, or are added by the secretary. Other accounts are created by the secretary after the Dean activates the secretary. How duplicates are prevented is TBD (ALL-01-F).
 
 ---
 
