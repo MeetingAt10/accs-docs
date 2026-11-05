@@ -24,7 +24,7 @@ Wraps P03 to P52. Reference composition: design system `site/app/_site/examples/
 
 ### Module sites in the shell
 
-The shell is one component (`AppChrome` in `src/components/app/navigation.tsx`) that serves all seven sites. It derives the current site from the path (`siteForPath`) and sets `data-site` and `data-lane` on the shell, which drive the lane tint. Host resolution and cross-site redirects are in [sitemap §4](../sitemap.md#4-primary-navigation-and-contextual-sidebar); the redirect runs in `beforeLoad` of `src/routes/__root.tsx`, and the root route also rewrites links the design system renders so they point at the owning host.
+The shell is one component (`AppChrome` in `src/components/app/navigation.tsx`) that serves all seven sites. It derives the current site from the path (`siteForPath`) and sets `data-site` and `data-lane` on the shell, which drive the lane tint. Every site is on the portal host, so moving between sites is client-side navigation ([sitemap §4](../sitemap.md#4-primary-navigation-and-contextual-sidebar)).
 
 | Element | Where | Behavior |
 |---|---|---|
@@ -34,7 +34,7 @@ The shell is one component (`AppChrome` in `src/components/app/navigation.tsx`) 
 
 Cases and Records use the neutral lane (grievance mode: a gray tint instead of a brand color). Forums uses the community (violet) lane, Schedule the consult (teal) lane, and the other sites navy. See [design-system.md](../design-system.md#navigation-and-wayfinding).
 
-Guard: `beforeLoad` checks the session and redirects to `/sign-in?redirect=<path>` before any shell renders. A path or host the role may not open (`canOpenPath`) renders the full-page **Access denied** view (`AccessDenied` in `guards.tsx`: lock icon, "You don't have access to this page", the role and site named in one sentence, and a "Go to your home" button) with no shell links. After sign-in the redirect is followed only if the new session may open it (S5 ALL-01-E).
+Guard: `beforeLoad` checks the session and redirects to `/sign-in?redirect=<path>` before any shell renders. A path the role may not open (`canOpenPath`) renders the full-page **Access denied** view (`AccessDenied` in `guards.tsx`: lock icon, "You don't have access to this page", the role and site named in one sentence, and a "Go to your home" button) with no shell links. After sign-in the redirect is followed only if the new session may open it (S5 ALL-01-E).
 
 ## P01 `/` — entry redirect
 
@@ -102,7 +102,7 @@ Files: `src/routes/_auth/sign-in.tsx`, `-auth-shell.tsx`, `auth.css`. No app she
 
 Password rule: 10+ characters with upper and lower case, a number, and a symbol. Seeded pilot accounts sign in with their ID or email and the shared pilot password, which each environment sets through the stack parameter `SeedPassword` (Lambda `SEED_PASSWORD`; a built-in default applies to local runs and tests only), which must be rotated or disabled before real users join.
 
-After sign-in the person goes to the `redirect` parameter if present, otherwise to the current site's first permitted landing, otherwise to Home (`/admin` for an Administrator). If that route is on another site's host, the browser loads that host ([sitemap §4.2](../sitemap.md#42-cross-site-behavior)). `/sign-in` is served on every host.
+After sign-in the person goes to the `redirect` parameter if present, otherwise to Home (`/admin` for an Administrator). Every route is on the portal host ([sitemap §4.1](../sitemap.md#41-host-and-sign-in)).
 
 ### First sign-in (`/first-login`)
 
