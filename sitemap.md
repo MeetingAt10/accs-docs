@@ -264,7 +264,7 @@ src/routes/
     └── admin/index.tsx · users/index.tsx · users/$userId.tsx · roles.tsx · moderation/index.tsx · moderation/$itemId.tsx · audit.tsx · monitoring.tsx   P45–P52
 ```
 
-Each route declares its permission key in `beforeLoad` (for example `requirePermission('case.view')`). A failed check renders the restricted state inside the shell and keeps the URL, so testers can confirm S5 ALL-01-E and ALL-01-J. Loaders call the API, which applies the scope rules again.
+Each route declares its permission key in `beforeLoad` (`RoutePermission(context.queryClient, 'P21')`, which checks the page against the session's allowed pages). A failed check renders the restricted state inside the shell and keeps the URL, so testers can confirm S5 ALL-01-E and ALL-01-J. Loaders call the API, which applies the scope rules again.
 
 ---
 
