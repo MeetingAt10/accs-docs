@@ -40,11 +40,11 @@ Guard: `beforeLoad` checks the session and redirects to `/sign-in?redirect=<path
 
 | | |
 |---|---|
-| File | `src/routes/index.tsx` (today: the coming-soon page) |
+| File | `src/routes/index.tsx` |
 | Permission | none |
 | Modules | ALL-01 |
 
-Signed in: redirect to `/home`. Signed out: redirect to `/sign-in`. Keep the current coming-soon page at `/` until launch, behind a flag.
+There is no page at `/`: it only redirects. Signed in, it goes to the session's landing page (`landingFor`: `/first-login` while the account still has temporary sign-in details, otherwise Home, or Admin for an administrator). Signed out, it goes to `/sign-in`.
 
 ## P02 Sign in — `/sign-in`
 
@@ -59,21 +59,22 @@ Signed in: redirect to `/home`. Signed out: redirect to `/sign-in`. Keep the cur
 
 **Purpose.** Sign in with a verified QCU account and land in the role's view.
 
-**Layout**
+**Layout** (as built in `src/routes/_auth/sign-in.tsx` and `-auth-shell.tsx`)
 
 | Region | Components | Notes |
 |---|---|---|
-| Page | `Container width="reading"`, `.ds-sheet` canvas | No app shell. |
-| Card | `Card overlay` | One floating panel. |
-| Brand | `DoorPlate size="lg" code="Portal"` | ACCS wordmark until a logo is approved. |
-| Heading | `SectionHeader level={1} title="Sign in" description="Use your official QCU account."` | |
-| Messages | `Alert` (see states) | Above the fields, so screen readers hear it first. |
-| Identifier | `TextField label="QCU email" type="email" autoComplete="username" isRequired` | Whether the identifier is the QCU email or the student/employee ID is TBD (ALL-01-F, K). |
-| Password | `TextField label="Password" type="password" autoComplete="current-password" isRequired` | |
-| Remember | `Checkbox` "Keep me signed in on this device" † | Only if the session policy allows it (ALL-01-G). |
-| Submit | `Button type="submit"` "Sign in" | Shows `loading` while checking. |
-| Help | `Disclosure title="Can't sign in?"` | Plain text: who to contact. Password recovery is TBD, so no reset link yet. |
-| Prototype note | `PrivacyNotice title="Prototype"` | "ACCS uses simulated enrollment data. Don't enter real records." |
+| Page | Two panels, no app shell | The brand panel (dark in both themes) on the left, the form on the right. On a phone the brand panel sits above the form. |
+| Brand | `aside.au-brand` | ACCS plate, "QCU · College of Computer Studies", the headline, and three short facts (class spaces, appointments, confidential reports). |
+| Heading | `h1` "Sign in" | |
+| Notice | `Alert tone="success"` | Shown after a password reset ("Your password was changed. Sign in with the new password."). |
+| Identifier | Text input "Email, ID, or username" (`autoComplete="username"`) | Accepts the email, the account ID, the username, or the student or employee number. |
+| Password | Password input with show/hide (`autoComplete="current-password"`) | |
+| Remember | Checkbox "Remember me" | Keeps the session for up to 30 days (7 days idle) instead of 12 hours (30 minutes idle), the policy approved on 10 November 2026. |
+| Forgot password | Link button "Forgot password?" | Swaps the form for the reset panel on the same page (see below). |
+| Errors | `Alert tone="danger"` above the button | The API's message, for example a wrong email or password, or too many attempts. |
+| Submit | "Sign in" | Shows a loading state while checking. |
+
+There is no "Can't sign in?" panel and no "Prototype" notice.
 
 **States**
 
