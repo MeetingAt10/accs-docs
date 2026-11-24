@@ -30,6 +30,10 @@ Back to [index](README.md) · [sitemap](../sitemap.md)
 
 `ModulePicker` (`src/components/app/module-picker.tsx`) sits under the heading: a "Choose a module" grid of tiles for the person's roles, in e-services style. A built module (Concerns, Schedule, Messages, Notifications for students and professors; Accounts for the Dean and secretary) links to its first page the session may open. A module not built yet (Dean, Program chair, Guidance, OSAS, President's office) shows a tile marked "Not available yet" with no link. Advisor tiles show for every professor until the session carries adviser assignments.
 
+Home no longer shows these tiles as "Quick access" (neither in the side column nor in the hero); the hero's action buttons and the navigation menu reach the same modules.
+
+**Empty main column.** When the main column has nothing to list (no evaluations due, reports, or cases: a secretary or organization, or a chair with an empty queue), it shows one panel instead of a blank space, worded for the role: "My reports" / "No reports yet" for students, "Assigned reports" / "No assigned reports yet" for professors, "Case queue" / "Your queue is empty" for the case offices, and "Your work" / "Nothing needs you yet" for everyone else. The side column keeps its own lists.
+
 ### Variants
 
 **Student**
