@@ -14,6 +14,7 @@ Start at [`sitemap.md`](sitemap.md). It is the index: sources, the eleven roles 
 | [`design-system.md`](design-system.md) | The ACCS design system foundation (v0.1, proposed) |
 | [`hardware-software-requirements.md`](hardware-software-requirements.md) | Proposed hardware and software baseline for team review |
 | [`hardware-software-requirements-final.md`](hardware-software-requirements-final.md) | The same requirements as short paper-ready text |
+| [`context-aware-escalation-paper.md`](context-aware-escalation-paper.md) | Paper-ready description of the rule-based context-aware escalation method (draft) |
 
 The infrastructure is documented in the `accs-architecture` repo. Its Mermaid sitemap is `diagrams/sitemap.md` there. It shows the pages by area; routes and access rules stay in `sitemap.md` here.
 
